@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sports Oracle: NFL, NBA, NHL & College Game Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0f1d;--panel:#121a2c;--panel2:#19233b;--line:#25304d;--text:#e9edf7;--muted:#8e9aba;--accent:#ff7a1a;--good:#34d399;--bad:#f87171;--warn:#fbbf24;--blue:#60a5fa}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:1.45}
+a{color:#ffb067}
+.wrap{max-width:1200px;margin:0 auto;padding:18px 18px 60px}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.logo{width:42px;height:42px;flex:none}
+h1{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:30px;letter-spacing:.5px;margin:0;line-height:1}
+h1 small{display:block;font-family:Inter;font-weight:500;font-size:12px;color:var(--muted);letter-spacing:0;margin-top:3px}
+.status{margin-left:auto;font-size:12px;color:var(--muted);background:var(--panel);border:1px solid var(--line);padding:5px 10px;border-radius:999px}
+.status b{color:var(--good)}
+.sports{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.sports button{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:9px 14px;border-radius:12px;cursor:pointer;font:inherit;font-weight:700;font-size:14px}
+.sports button .dot{width:10px;height:10px;border-radius:50%}
+.sports button.on{color:var(--text);border-color:var(--accent);background:var(--panel2)}
+nav{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:18px}
+nav a{padding:10px 14px;color:var(--muted);text-decoration:none;font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px}
+nav a.on{color:var(--text);border-color:var(--accent)}
+nav a:hover{color:var(--text)}
+.view{display:none}.view.on{display:block}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
+@media(max-width:860px){.g2,.g3,.g4,.g5{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h2,.card h3{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.4px;margin:0 0 10px;text-transform:uppercase}
+.card h2{font-size:20px}.card h3{font-size:16px;color:#ffb067}
+.sub{font-family:Inter;font-weight:500;font-size:12px;color:var(--muted);text-transform:none;letter-spacing:0}
+label{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px;font-weight:500}
+input,select,textarea{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit}
+input[type=checkbox]{width:auto;accent-color:var(--accent)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+textarea{font-family:'JetBrains Mono',monospace;font-size:12px;min-height:140px;resize:vertical}
+.row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}.row>*{flex:1;min-width:90px}
+.chk{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-top:8px;cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#1a0d00;border:0;border-radius:8px;padding:9px 14px;cursor:pointer;font:inherit;font-weight:700;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}.btn.ghost:hover{border-color:var(--accent)}.btn.sm{padding:5px 9px;font-size:12px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;background:transparent;color:var(--muted);border:0;padding:8px 6px;cursor:pointer;font:inherit;font-weight:600;font-size:13px}
+.seg button.on{background:var(--panel2);color:var(--text);box-shadow:inset 0 -2px 0 var(--accent)}
+.mono{font-family:'JetBrains Mono',monospace}.muted{color:var(--muted)}.good{color:var(--good)}.bad{color:var(--bad)}.warn{color:var(--warn)}.small{font-size:12px}
+.badge{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--panel2);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.badge.ok{color:var(--good);border-color:rgba(52,211,153,.35)}.badge.no{color:var(--warn);border-color:rgba(251,191,36,.35)}
+.teamhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;text-align:center;padding:6px 0 12px}
+.score .nm{font-weight:700;font-size:15px}.score .pts{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:58px;line-height:1}
+.score .vs{color:var(--muted);font-family:'Barlow Condensed';font-size:16px}
+.probbar{height:12px;border-radius:99px;overflow:hidden;display:flex;background:var(--panel2);margin:4px 0 6px}.probbar div{height:100%}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+@media(max-width:620px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel2);border-radius:10px;padding:10px}
+.kpi .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.kpi .v{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;margin-top:2px}
+.kpi .s{font-size:11px;color:var(--muted)}
+.pick{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--panel2);margin-top:8px;border-left:4px solid var(--line)}
+.pick.val{border-left-color:var(--good)}.pick.strong{border-left-color:var(--good);background:rgba(52,211,153,.08)}
+.pick .t{font-weight:700}.pick .d{font-size:12px;color:var(--muted)}.pick .e{margin-left:auto;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--panel)}
+th.sort{cursor:pointer}th.sort:hover{color:var(--text)}
+td.n,th.n{text-align:right;font-family:'JetBrains Mono',monospace}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--panel2)}
+.tbl{max-height:580px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.note{font-size:12px;color:var(--muted);background:var(--panel2);border-radius:8px;padding:10px 12px;margin-top:10px}
+.msg{font-size:13px;margin-top:10px;min-height:1em}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px}
+.tag.g{background:rgba(52,211,153,.15);color:var(--good)}.tag.r{background:rgba(248,113,113,.15);color:var(--bad)}.tag.y{background:rgba(251,191,36,.15);color:var(--warn)}.tag.m{background:var(--panel2);color:var(--muted)}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--panel2);padding:1px 5px;border-radius:4px}
+.guide p,.guide li{color:#c9d1e6}
+.log-score input{width:58px;padding:4px 6px;text-align:center}
+.hide{display:none!important}
+.bt-sport{border-left:4px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#ff7a1a"/><path d="M14 30l7-7 5 5 9-11" fill="none" stroke="#1a0d00" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="35" cy="17" r="2.6" fill="#1a0d00"/></svg>
+  <h1>Sports Oracle<small>Game predictions for NFL, NBA, NHL, college football &amp; college basketball · backtested on 2 seasons + this one</small></h1>
+  <div class="status" id="saveStatus">Loading…</div>
+</header>
+<div class="sports" id="sports"></div>
+<nav id="nav">
+  <a href="#predict" data-v="predict">Predict</a>
+  <a href="#slate" data-v="slate">Slate</a>
+  <a href="#ratings" data-v="ratings">Power ratings</a>
+  <a href="#results" data-v="results">Add results</a>
+  <a href="#backtest" data-v="backtest">Backtest</a>
+  <a href="#log" data-v="log">Track record</a>
+  <a href="#guide" data-v="guide">How it works</a>
+</nav>
+
+<section class="view" id="v-predict">
+  <div class="grid g2">
+    <div class="grid">
+      <div class="card">
+        <h2>Matchup <span class="sub" id="asOf"></span></h2>
+        <div class="grid g2"><div id="sideA"></div><div id="sideH"></div></div>
+        <label>Venue</label>
+        <div class="seg" id="venue"><button data-v="H" class="on">Home team at home</button><button data-v="N">Neutral site</button></div>
+      </div>
+      <div class="card">
+        <h2>Sportsbook lines <span class="sub">optional, to find value</span></h2>
+        <div class="row">
+          <div><label>Favorite</label><select id="favSide"><option value="">(no spread)</option><option value="A">Away team</option><option value="H">Home team</option></select></div>
+          <div><label id="spreadLbl">Spread (points)</label><input id="spread" type="number" step="0.5" placeholder="e.g. 3.5"></div>
+          <div><label>Spread odds</label><input id="spreadOdds" type="number" value="-110"></div>
+        </div>
+        <div class="row">
+          <div><label>Total (O/U)</label><input id="total" type="number" step="0.5"></div>
+          <div><label>Total odds</label><input id="totalOdds" type="number" value="-110"></div>
+        </div>
+        <div class="row">
+          <div><label>Moneyline away</label><input id="mlA" type="number" placeholder="e.g. +150"></div>
+          <div><label>Moneyline home</label><input id="mlH" type="number" placeholder="e.g. -170"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="result"></div>
+  </div>
+</section>
+
+<section class="view" id="v-slate">
+  <div class="card">
+    <h2>Predict a full slate</h2>
+    <p class="muted small" style="margin-top:0">One game per line: <code>Away @ Home</code>, or <code>Team vs Team</code> for a neutral site. Optionally add the <b>home team's spread</b> and the <b>total</b> after commas: <code>Bills @ Chiefs, -2.5, 47.5</code>. Short names work if they match one team (e.g. <i>Lakers</i>, <i>Ohio State</i>).</p>
+    <textarea id="slateIn"></textarea>
+    <div class="btns"><button class="btn" id="slateGo">Predict slate</button><button class="btn ghost" id="slateDemo">Example games</button></div>
+    <div class="msg" id="slateMsg"></div>
+  </div>
+  <div class="card" style="margin-top:14px"><div class="tbl" id="slateOut"><div class="empty">Results show here, biggest edges first. Click a game to open it in Predict.</div></div></div>
+</section>
+
+<section class="view" id="v-ratings">
+  <div class="card">
+    <div class="row" style="align-items:center;margin-bottom:10px">
+      <h2 style="margin:0;flex:3">Power ratings <span class="sub" id="ratSub"></span></h2>
+      <input id="ratSearch" placeholder="Search teams…" style="flex:2">
+      <label class="chk" style="flex:0;white-space:nowrap;margin:0"><input type="checkbox" id="ratActive" checked> Played this season</label>
+    </div>
+    <div class="tbl" id="ratTable"></div>
+    <div class="note" id="ratNote"></div>
+  </div>
+</section>
+
+<section class="view" id="v-results">
+  <div class="grid g2">
+    <div class="card">
+      <h2>Add new results</h2>
+      <p class="muted small" style="margin-top:0">Ratings ship with every game through <b id="dataThru"></b>. Add newer final scores here and the ratings refit instantly. Paste CSV as <code>date,home,away,home_score,away_score,neutral</code> (neutral = 1 or 0; optional).</p>
+      <textarea id="resIn" placeholder="2026-11-09,Kansas City Chiefs,Buffalo Bills,27,24,0"></textarea>
+      <div class="btns"><button class="btn" id="resAdd">Add results</button></div>
+      <div class="msg" id="resMsg"></div>
+    </div>
+    <div class="card">
+      <h2>Quick add one game</h2>
+      <div class="row"><div><label>Date</label><input id="qDate" type="date"></div><label class="chk" style="flex:0;white-space:nowrap"><input type="checkbox" id="qNeu"> Neutral</label></div>
+      <div class="row"><div><label>Away team</label><input id="qAway" list="teamList"></div><div style="flex:0 0 80px"><label>Score</label><input id="qAs" type="number"></div></div>
+      <div class="row"><div><label>Home team</label><input id="qHome" list="teamList"></div><div style="flex:0 0 80px"><label>Score</label><input id="qHs" type="number"></div></div>
+      <div class="btns"><button class="btn" id="qAdd">Add game</button></div>
+      <div class="msg" id="qMsg"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px"><h2>Results you added <span class="sub" id="userCount"></span></h2><div class="tbl" id="userGames"></div></div>
+</section>
+
+<section class="view" id="v-backtest">
+  <div class="card">
+    <h2>How accurate is it? <span class="sub">walk-forward backtest on real results</span></h2>
+    <p class="muted small" style="margin-top:0">Every game from July 2024 to Nov 7, 2026 was predicted using only games played <b>before</b> it (ratings refit weekly), then scored against the final result. Model settings were tuned by searching for the lowest log loss. "Before tuning" is the same model with starting settings.</p>
+    <div class="tbl"><table id="btTable"></table></div>
+    <div class="note">Brier score measures probability accuracy: 0 is perfect and always guessing the home team's average win rate scores the "Baseline" column. Lower is better. NHL games are close to a coin flip for every model; even the betting market only picks about 58–60% of NHL winners.</div>
+  </div>
+  <div class="grid g5" style="margin-top:14px" id="calib"></div>
+  <div class="card" style="margin-top:14px">
+    <h2>Run your own backtest <span class="sub">on any historical results you paste</span></h2>
+    <p class="muted small" style="margin-top:0">Paste past seasons as <code>date,home,away,home_score,away_score,neutral</code>. The app replays them day by day using the current sport's model, then can auto-tune the settings for your data.</p>
+    <textarea id="btIn"></textarea>
+    <div class="row"><div><label>Test from date</label><input id="btFrom" type="date"></div><div></div><div></div></div>
+    <div class="btns"><button class="btn" id="btRun">Run backtest</button><button class="btn ghost" id="btTune">Auto-tune settings</button></div>
+    <div class="msg" id="btMsg"></div>
+  </div>
+</section>
+
+<section class="view" id="v-log">
+  <div class="grid g4" id="logStats"></div>
+  <div class="card" style="margin-top:14px">
+    <h2>Saved predictions</h2>
+    <p class="muted small" style="margin-top:0">Save predictions from the Predict tab and enter final scores later. Your record updates automatically, by sport.</p>
+    <div class="tbl" id="logTable"></div>
+  </div>
+</section>
+
+<section class="view guide" id="v-guide">
+  <div class="grid g2">
+    <div class="card">
+      <h2>The model</h2>
+      <p>Every team gets an <b>offense</b> rating (points or goals scored above an average team) and a <b>defense</b> rating (points allowed above average; lower is better). Ratings are opponent-adjusted: each one is solved together with every opponent's, so beating good teams counts more than beating bad ones.</p>
+      <ul>
+        <li><b>Projected score</b> = league average + your offense + opponent's defense ± half the home advantage (learned from the data each season).</li>
+        <li><b>Season carry-over:</b> each season starts from last season's ratings, pulled partway back to average, then this season's games take over.</li>
+        <li><b>Tuned per sport:</b> how much to carry over, how fast new games override the prior, whether recent games count more, how to treat blowouts, and how much a back-to-back hurts (NBA ≈ 2 points, NHL ≈ 0.45 goals).</li>
+        <li><b>Win probability:</b> football and basketball margins follow a bell curve (width fit by backtest). Hockey uses a Poisson goal model with overtime, so it handles puck lines and totals properly.</li>
+      </ul>
+      <h3>Finding value</h3>
+      <p>Enter a sportsbook line and the app compares the model's probability with the break-even probability of the price (52.4% at −110). Positive edge means the model rates the bet above what the price requires. Stakes use quarter-Kelly.</p>
+    </div>
+    <div class="card">
+      <h2>Using it well</h2>
+      <ul>
+        <li><b>Keep it current:</b> add finished games in <i>Add results</i> (or paste a day's scores) so the ratings stay fresh. They're saved to your account.</li>
+        <li><b>Injuries and news</b> aren't in the scores yet. Use the adjustment box: a star quarterback out is often worth 4–7 points, an NBA star 3–6, a starting goalie 0.2–0.4 goals.</li>
+        <li><b>Early season</b> ratings lean on last season. They sharpen after 3–4 football games or 8–10 basketball/hockey games.</li>
+        <li><b>The market is sharp.</b> This backtest measures accuracy against final scores, not against betting lines. Treat small edges (under ~3%) as noise and track results in <i>Track record</i> before trusting real money to it.</li>
+      </ul>
+      <div class="note">Data: final scores from ESPN's public scoreboard, 2022 through Nov 7, 2026. For entertainment and analysis. If you bet, bet only what you can afford to lose.</div>
+    </div>
+  </div>
+</section>
+</div>
+<datalist id="teamList"></datalist>
+<script>
+// ===== Oracle Sports multi-sport prediction engine =====
+const OE = (() => {
+  const norm = s => String(s || '').toLowerCase().replace(/&amp;/g, '&').replace(/[^a-z0-9&]+/g, ' ').trim();
+  function erf(x) { const s = Math.sign(x); x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x);
+    return s * (1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x)); }
+  const Phi = z => 0.5 * (1 + erf(z / Math.SQRT2));
+  const DAY = 864e5;
+  // season = year in which the season starts (July cutover works for all five sports)
+  const seasonOf = t => { const d = new Date(t); return d.getUTCMonth() >= 6 ? d.getUTCFullYear() : d.getUTCFullYear() - 1; };
+
+  // Sport configs. Model params are overwritten by tuned values.
+  const SPORTS = {
+    nfl: { name: 'NFL', short: 'NFL', unit: 'pts', dist: 'normal', p: { carry: 0.9, prior: 4, halfLife: 120, cap: 21, newTeam: 0, hcaPrior: 2, sigma: 13.25, sigmaT: 13.6, b2b: 0 } },
+    cfb: { name: 'College Football', short: 'CFB', unit: 'pts', dist: 'normal', p: { carry: 1, prior: 2, halfLife: 0, cap: 0, newTeam: -30, hcaPrior: 3, sigma: 17.25, sigmaT: 16.82, b2b: 0 } },
+    nba: { name: 'NBA', short: 'NBA', unit: 'pts', dist: 'normal', p: { carry: 0.75, prior: 4, halfLife: 40, cap: 25, newTeam: 0, hcaPrior: 2.5, sigma: 11.5, sigmaT: 18.84, b2b: 2 } },
+    nhl: { name: 'NHL', short: 'NHL', unit: 'goals', dist: 'poisson', p: { carry: 0.6, prior: 50, halfLife: 0, cap: 0, newTeam: 0, hcaPrior: 0.2, sigma: 2.4, sigmaT: 2.31, b2b: 0.45 } },
+    cbb: { name: "Men's College Basketball", short: 'CBB', unit: 'pts', dist: 'normal', p: { carry: 1, prior: 1, halfLife: 0, cap: 35, newTeam: -8, hcaPrior: 3, sigma: 11.75, sigmaT: 17.64, b2b: 0 } }
+  };
+
+  // ---- Fit one season: opponent-adjusted offense/defense with ridge pull toward prior means ----
+  // games: [{t,h,a,hs,as,n}] ; priors: {key:{o,d}} ; returns {teams:{key:{name,o,d,gp}}, mu, hca}
+  function fitSeason(games, priors, P, refT, init) {
+    const lambda = P.prior, cap = P.cap, hl = P.halfLife;
+    const idx = new Map(), names = [];
+    const id = n => { const k = norm(n); if (!idx.has(k)) { idx.set(k, names.length); names.push(n); } return idx.get(k); };
+    const G = games.map(g => {
+      let hs = g.hs, as = g.as; const m = hs - as;
+      if (cap > 0 && Math.abs(m) > cap) { const ex = (Math.abs(m) - cap) / 2 * Math.sign(m); hs -= ex; as += ex; }
+      const w = hl > 0 ? Math.pow(0.5, Math.max(0, (refT - g.t) / DAY) / hl) : 1;
+      return { h: id(g.h), a: id(g.a), hs, as, nh: g.n ? 0 : 1, w };
+    });
+    const N = names.length;
+    const po = new Float64Array(N), pd = new Float64Array(N), o = new Float64Array(N), d = new Float64Array(N);
+    for (let i = 0; i < N; i++) {
+      const pr = priors && priors[norm(names[i])];
+      if (pr) { po[i] = pr.o; pd[i] = pr.d; } else { po[i] = P.newTeam / 2; pd[i] = -P.newTeam / 2; }
+      const it = init && init.teams[norm(names[i])];
+      o[i] = it ? it.o : po[i]; d[i] = it ? it.d : pd[i];
+    }
+    let mu = init ? init.mu : (G.length ? G.reduce((s, g) => s + g.hs + g.as, 0) / (2 * G.length) : 0);
+    let hca = init ? init.hca : P.hcaPrior;
+    const by = Array.from({ length: N }, () => []);
+    G.forEach((g, k) => { by[g.h].push(k); by[g.a].push(k); });
+    const iters = init ? 20 : 60;
+    for (let it = 0; it < iters; it++) {
+      for (let i = 0; i < N; i++) {
+        let s = lambda * po[i], w = lambda;
+        for (const k of by[i]) { const g = G[k];
+          s += g.w * (g.h === i ? g.hs - mu - d[g.a] - g.nh * hca / 2 : g.as - mu - d[g.h] + g.nh * hca / 2); w += g.w; }
+        o[i] = s / w;
+      }
+      for (let i = 0; i < N; i++) {
+        let s = lambda * pd[i], w = lambda;
+        for (const k of by[i]) { const g = G[k];
+          s += g.w * (g.h === i ? g.as - mu - o[g.a] + g.nh * hca / 2 : g.hs - mu - o[g.h] - g.nh * hca / 2); w += g.w; }
+        d[i] = s / w;
+      }
+      let sm = 0, sw = 0, sh = 0, swh = 0;
+      for (const g of G) {
+        sm += g.w * ((g.hs - o[g.h] - d[g.a] - g.nh * hca / 2) + (g.as - o[g.a] - d[g.h] + g.nh * hca / 2)); sw += 2 * g.w;
+        if (g.nh) { sh += g.w * ((g.hs - g.as) - ((o[g.h] + d[g.a]) - (o[g.a] + d[g.h]))); swh += g.w; }
+      }
+      if (sw) mu = sm / sw;
+      hca = (sh + P.hcaPrior * 30) / (swh + 30);
+    }
+    const teams = {};
+    for (let i = 0; i < N; i++) teams[norm(names[i])] = { name: names[i], o: o[i], d: d[i], gp: by[i].length };
+    // keep prior-only teams (no games yet this season) so they can still be predicted
+    if (priors) for (const k in priors) if (!teams[k]) teams[k] = { name: priors[k].name, o: priors[k].o, d: priors[k].d, gp: 0 };
+    return { teams, mu, hca };
+  }
+  // Prior means for a new season from last season's final fit
+  function carryPriors(fit, carry) {
+    if (!fit) return null; const out = {};
+    for (const k in fit.teams) { const t = fit.teams[k]; out[k] = { name: t.name, o: t.o * carry, d: t.d * carry }; }
+    return out;
+  }
+  // Ratings as of time T (exclusive), using all prior seasons as carry-over priors
+  function ratingsAt(games, P, T, cache) {
+    const seasons = [...new Set(games.map(g => g.s))].sort((a, b) => a - b);
+    const curS = seasonOf(T);
+    let prevFit = null, mu0 = null;
+    for (const s of seasons) {
+      if (s >= curS) break;
+      const key = s + JSON.stringify(P);
+      if (cache && cache[key]) { prevFit = cache[key]; continue; }
+      const sg = games.filter(g => g.s === s);
+      const f = fitSeason(sg, carryPriors(prevFit, P.carry), P, sg.length ? sg[sg.length - 1].t + DAY : T);
+      if (cache) cache[key] = f; prevFit = f;
+    }
+    const cur = games.filter(g => g.s === curS && g.t < T);
+    const f = fitSeason(cur, carryPriors(prevFit, P.carry), P, T);
+    if (!cur.length && prevFit) { f.mu = prevFit.mu; f.hca = prevFit.hca; }
+    return f;
+  }
+
+  // ---- Game model ----
+  function expected(R, home, away, neutral, adj = {}) {
+    const H = R.teams[norm(home)], A = R.teams[norm(away)];
+    if (!H || !A) return null;
+    const h = neutral ? 0 : R.hca / 2;
+    let ph = R.mu + H.o + A.d + h + (adj.h || 0), pa = R.mu + A.o + H.d - h + (adj.a || 0);
+    return { ph, pa, H, A };
+  }
+  const pois = (l, k) => { let p = Math.exp(-l); for (let i = 1; i <= k; i++) p *= l / i; return p; };
+  function poissonGrid(lh, la, max = 14) {
+    lh = Math.max(0.2, lh); la = Math.max(0.2, la);
+    const ph = [], pa = []; for (let k = 0; k <= max; k++) { ph.push(pois(lh, k)); pa.push(pois(la, k)); }
+    return { ph, pa, max };
+  }
+  // Probability summary for a matchup. Returns pHome (win incl. OT), and functions for lines.
+  function gameProbs(sport, e, P) {
+    const cfg = SPORTS[sport];
+    if (cfg.dist === 'normal') {
+      const m = e.ph - e.pa, t = e.ph + e.pa;
+      return { pHome: Phi(m / P.sigma), margin: m, total: t,
+        cover: spreadHome => Phi((m + spreadHome) / P.sigma),          // P(home covers spreadHome, e.g. -3.5)
+        over: line => 1 - Phi((line - t) / P.sigmaT) };
+    }
+    // NHL: independent Poisson goals, ties -> OT/shootout (adds one goal to the winner)
+    const g = poissonGrid(e.ph, e.pa);
+    let win = 0, loss = 0, tie = 0;
+    for (let i = 0; i <= g.max; i++) for (let j = 0; j <= g.max; j++) { const p = g.ph[i] * g.pa[j]; if (i > j) win += p; else if (i < j) loss += p; else tie += p; }
+    const otHome = 0.5 + Math.max(-0.15, Math.min(0.15, (e.ph - e.pa) * 0.12));
+    const pHome = win + tie * otHome;
+    return { pHome, margin: e.ph - e.pa, total: e.ph + e.pa, pTie: tie,
+      cover: spreadHome => { // final margin; OT games end +/-1
+        let p = 0;
+        for (let i = 0; i <= g.max; i++) for (let j = 0; j <= g.max; j++) { const q = g.ph[i] * g.pa[j];
+          if (i === j) { p += q * (otHome * (1 + spreadHome > 0 ? 1 : 0) + (1 - otHome) * (-1 + spreadHome > 0 ? 1 : 0)); }
+          else if (i - j + spreadHome > 0) p += q; }
+        return p; },
+      over: line => { let p = 0;
+        for (let i = 0; i <= g.max; i++) for (let j = 0; j <= g.max; j++) { const q = g.ph[i] * g.pa[j]; if (i + j + (i === j ? 1 : 0) > line) p += q; }
+        return p; } };
+  }
+
+  // ---- Walk-forward backtest ----
+  // Refit every `step` days; predict each game using only games before its date.
+  function backtest(sport, games, P, testFrom, opts = {}) {
+    const step = opts.step || 7, minGp = opts.minGp ?? 0;
+    const test = games.filter(g => g.t >= testFrom);
+    if (!test.length) return null;
+    const cache = {};
+    const res = [];
+    let i = 0;
+    while (i < test.length) {
+      const T = test[i].t;
+      const R = ratingsAt(games, P, T, cache);
+      const end = Math.min(T + step * DAY, seasonOf(T) !== seasonOf(T + step * DAY) ? T + DAY : T + step * DAY);
+      while (i < test.length && test[i].t < end && seasonOf(test[i].t) === seasonOf(T)) {
+        const g = test[i++];
+        const e = expected(R, g.h, g.a, g.n);
+        if (!e || e.H.gp < minGp || e.A.gp < minGp) continue;
+        res.push({ g, ph: e.ph, pa: e.pa });
+      }
+    }
+    return score(sport, res, P);
+  }
+  function score(sport, res, P) {
+    const n = res.length; if (!n) return null;
+    const cfg = SPORTS[sport];
+    let sigma = P.sigma;
+    if (cfg.dist === 'normal') { // calibrate sigma by likelihood
+      let best = Infinity;
+      for (let sg = 5; sg <= 25; sg += 0.25) {
+        let L = 0; for (const r of res) { const am = r.g.hs - r.g.as; if (am === 0) continue; const p = Phi((r.ph - r.pa) / sg); L -= Math.log(Math.min(1 - 1e-9, Math.max(1e-9, am > 0 ? p : 1 - p))); }
+        if (L < best) { best = L; sigma = sg; }
+      }
+    }
+    const P2 = { ...P, sigma };
+    let correct = 0, brier = 0, ll = 0, mae = 0, maeT = 0, homeWins = 0, decided = 0, sqT = 0;
+    const bins = Array.from({ length: 5 }, (_, i) => ({ lo: 50 + i * 10, n: 0, p: 0, w: 0 }));
+    for (const r of res) {
+      const am = r.g.hs - r.g.as, at = r.g.hs + r.g.as;
+      mae += Math.abs(am - (r.ph - r.pa)); maeT += Math.abs(at - (r.ph + r.pa)); sqT += (at - (r.ph + r.pa)) ** 2;
+      if (am === 0) continue; decided++;
+      const pr = gameProbs(sport, r, P2).pHome, won = am > 0 ? 1 : 0;
+      homeWins += won;
+      if ((pr >= 0.5) === (won === 1)) correct++;
+      brier += (pr - won) ** 2; ll -= Math.log(Math.min(1 - 1e-9, Math.max(1e-9, won ? pr : 1 - pr)));
+      const fav = Math.max(pr, 1 - pr), favWon = pr >= 0.5 ? won : 1 - won;
+      const b = bins[Math.min(4, Math.floor((fav * 100 - 50) / 10))]; b.n++; b.p += fav; b.w += favWon;
+    }
+    const hb = homeWins / decided;
+    return { n, accuracy: correct / decided, brier: brier / decided, logloss: ll / decided, mae: mae / n, maeTotal: maeT / n,
+      sigma, sigmaT: Math.sqrt(sqT / n), homeRate: hb, baseBrier: hb * (1 - hb),
+      bins: bins.map(b => ({ label: `${b.lo}-${b.lo + 10}%`, n: b.n, pred: b.n ? b.p / b.n : null, actual: b.n ? b.w / b.n : null })) };
+  }
+  // Coordinate-descent tuning on log loss
+  const GRID = {
+    carry: [0.3, 0.45, 0.6, 0.75, 0.9],
+    prior: [1, 2, 4, 7, 12, 20, 35],
+    halfLife: [0, 20, 40, 70, 120],
+    cap: { nfl: [14, 21, 28, 0], cfb: [21, 28, 35, 0], nba: [12, 18, 25, 0], nhl: [2, 3, 4, 0], cbb: [15, 20, 25, 35, 0] },
+    newTeam: { nfl: [0], nba: [0], nhl: [0], cfb: [-30, -20, -10, 0], cbb: [-15, -8, 0] }
+  };
+  function tune(sport, games, testFrom, log = () => {}) {
+    let P = { ...SPORTS[sport].p };
+    let best = backtest(sport, games, P, testFrom); log('start', P, best.logloss);
+    for (let pass = 0; pass < 2; pass++) {
+      let improved = false;
+      for (const key of ['carry', 'prior', 'halfLife', 'cap', 'newTeam']) {
+        const vals = Array.isArray(GRID[key]) ? GRID[key] : GRID[key][sport];
+        for (const v of vals) {
+          if (v === P[key]) continue;
+          const Q = { ...P, [key]: v }; const r = backtest(sport, games, Q, testFrom);
+          if (r && r.logloss < best.logloss - 1e-5) { P = Q; best = r; improved = true; log(key, v, r.logloss); }
+        }
+      }
+      if (!improved) break;
+    }
+    P.sigma = best.sigma; P.sigmaT = best.sigmaT;
+    return { P, result: best };
+  }
+  return { norm, Phi, seasonOf, SPORTS, fitSeason, carryPriors, ratingsAt, expected, gameProbs, backtest, score, tune, GRID, DAY };
+})();
+
+
+</script>
+<script>
+const DATA = {"nfl": "nfl|22.92|1.69|Philadelphia Eagles^Dallas Cowboys^Los Angeles Chargers^Kansas City Chiefs^Atlanta Falcons^Tampa Bay Buccaneers^Cleveland Browns^Cincinnati Bengals^Indianapolis Colts^Miami Dolphins^New England Patriots^Las Vegas Raiders^New Orleans Saints^Arizona Cardinals^New York Jets^Pittsburgh Steelers^Washington Commanders^New York Giants^Jacksonville Jaguars^Carolina Panthers^Denver Broncos^Tennessee Titans^Seattle Seahawks^San Francisco 49ers^Green Bay Packers^Detroit Lions^Los Angeles Rams^Houston Texans^Buffalo Bills^Baltimore Ravens^Chicago Bears^Minnesota Vikings|-0.5,-3.5;2.7,5.6;-1.5,-2.3;-1.9,-2.8;-1,0.8;0.2,0.5;-5.5,-0.7;2.7,3.6;2.6,2.7;-1.9,1.1;0.8,-2.8;-5.4,1.6;-3.8,-0.7;-1.2,3.2;-3.9,3.9;-0.9,-0.9;0,2.7;-1.4,1.7;2.4,-1.3;-2.8,0.5;-0.1,-2.9;-3.4,3.4;3.6,-4.6;2.4,-0.2;0.5,-1.2;4.9,1.3;5.2,-1.1;0.6,-3.8;5,0.3;2.8,-0.9;1,0.1;-2.3,-3.5|70,22,10,13,10;71,26,23,7,27,1;74,7,5,33,27;74,25,12,31,30;74,21,14,10,23;74,8,29,23,41;74,15,4,20,13;74,19,30,37,59;74,18,6,34,10;74,27,28,31,36;74,11,9,27,13;74,31,24,39,22;74,0,16,24,22;74,2,13,14,26;74,17,1,28,20;75,3,20,31,10;78,28,25,41,31;81,4,19,3,34;81,30,31,3,9;81,21,0,20,24;81,10,15,20,3;81,14,24,17,20;81,5,6,19,23;81,29,12,17,24;81,27,7,6,20;81,20,18,20,13;81,2,11,14,26;81,1,16,37,20;81,13,22,7,31;81,23,9,35,13;81,3,8,33,30;82,26,17,28,6;85,24,4,14,35;88,28,2,24,16;88,6,19,21,18;88,25,14,31,24;88,8,27,19,17;88,9,3,10,24;88,17,21,12,7;88,15,7,30,27;88,16,22,33,31;88,18,10,35,6;88,23,13,36,30;88,5,31,16,23;88,1,29,31,34,1;88,12,11,27,35;88,20,26,30,26;89,30,0,27,7;92,6,15,27,24;95,16,8,13,30,1;95,28,10,26,29;95,30,14,23,12;95,7,18,17,22;95,17,13,36,24;95,0,26,20,24;95,5,24,14,17;95,29,21,24,18;95,27,1,30,34;95,31,9,15,10;95,11,3,27,30;95,23,20,24,14;95,22,2,30,23;95,19,25,32,26;96,12,4,24,45;99,1,5,16,24;102,18,0,19,17,1;102,24,30,31,7;102,21,27,3,26;102,9,7,24,31;102,10,11,45,17;102,12,31,13,23;102,14,6,17,12;102,15,8,34,22;102,16,17,27,27;102,2,20,17,23;102,13,25,21,45;102,22,23,29,32;102,4,29,23,30;103,26,28,34,37;106,20,22,17,14;109,18,27,31,34,1;109,4,30,23,31;109,6,29,13,10;109,8,21,20,26;109,10,14,26,19;109,17,12,27,34;109,0,19,14,25;109,5,15,19,26;109,26,13,16,18;109,3,2,22,6;109,11,28,30,33;109,24,1,23,13;110,23,16,23,17;113,30,10,30,24;116,12,15,10,16,1;116,4,23,29,20;116,21,6,24,27;116,31,8,16,10;116,14,9,25,28;116,19,5,13,43;116,29,7,13,35;116,27,17,21,27;116,13,20,16,30;116,25,24,20,17;116,11,26,21,35;116,22,3,20,3;117,0,1,21,38;120,24,19,27,19;123,28,29,36,10;123,7,21,43,36;123,1,13,30,33;123,25,31,19,15;123,14,11,33,38;123,15,6,27,6;123,5,4,16,0;123,18,8,42,7;123,26,2,24,9;123,20,3,28,24;123,9,10,19,24;123,16,0,27,10;124,22,30,17,34;127,29,18,10,33", "cfb": "cfb|27.53|3.73|Kansas State Wildcats^Iowa State Cyclones^UNLV Rebels^Idaho State Bengals^Kansas Jayhawks^Fresno State Bulldogs^Western Kentucky Hilltoppers^Sam Houston Bearkats^Hawai'i Rainbow Warriors^Stanford Cardinal^South Florida Bulls^Boise State Broncos^Rutgers Scarlet Knights^Ohio Bobcats^Bowling Green Falcons^Lafayette Leopards^NC State Wolfpack^East Carolina Pirates^UCF Knights^Jacksonville State Gamecocks^Delaware Blue Hens^Delaware State Hornets^UL Monroe Warhawks^Akron Zips^Wyoming Cowboys^Missouri Tigers^Central Arkansas Bears^Duke Blue Devils^Elon Phoenix^Oklahoma State Cowboys^UT Martin Skyhawks^Minnesota Golden Gophers^Buffalo Bulls^Houston Cougars^UAB Blazers^Alabama State Hornets^Cincinnati Bearcats^Nebraska Cornhuskers^Wisconsin Badgers^Miami (OH) RedHawks^San Diego State Aztecs^Stony Brook Seawolves^Illinois Fighting Illini^Western Illinois Leathernecks^Army Black Knights^Tarleton State Texans^Michigan State Spartans^Western Michigan Broncos^Wake Forest Demon Deacons^Kennesaw State Owls^Charlotte 49ers^App State Mountaineers^Wagner Seahawks^Baylor Bears^Auburn Tigers^Colorado Buffaloes^Georgia Tech Yellow Jackets^Florida International Panthers^Bethune-Cookman Wildcats^San Jos\u00e9 State Spartans^Central Michigan Chippewas^Ohio State Buckeyes^Texas Longhorns^Penn State Nittany Lions^Nevada Wolf Pack^Clemson Tigers^LSU Tigers^Georgia Bulldogs^Marshall Thundering Herd^Oregon Ducks^Montana State Bobcats^Florida State Seminoles^Alabama Crimson Tide^Arizona State Sun Devils^Northern Arizona Lumberjacks^Michigan Wolverines^New Mexico Lobos^Florida Gators^Long Island University Sharks^SMU Mustangs^East Texas A+M Lions^North Dakota Fighting Hawks^Oklahoma Sooners^Illinois State Redbirds^Texas A+M Aggies^UTSA Roadrunners^Indiana Hoosiers^Old Dominion Monarchs^Ole Miss Rebels^Georgia State Panthers^South Dakota Coyotes^Texas Tech Red Raiders^Arkansas-Pine Bluff Golden Lions^Tennessee Volunteers^Syracuse Orange^Southern Miss Golden Eagles^Mississippi State Bulldogs^Maryland Terrapins^Florida Atlantic Owls^Purdue Boilermakers^Ball State Cardinals^Tulane Green Wave^Northwestern Wildcats^Pittsburgh Panthers^Duquesne Dukes^Navy Midshipmen^VMI Keydets^Kent State Golden Flashes^Merrimack Warriors^Kentucky Wildcats^Toledo Rockets^Boston College Eagles^Fordham Rams^West Virginia Mountaineers^Robert Morris Colonials^UConn Huskies^Central Connecticut Blue Devils^Louisville Cardinals^Eastern Kentucky Colonels^Air Force Falcons^Bucknell Bison^Massachusetts Minutemen^Temple Owls^Northern Illinois Huskies^Holy Cross Crusaders^Liberty Flames^Maine Black Bears^Arkansas Razorbacks^Memphis Tigers^Iowa Hawkeyes^UAlbany Great Danes^Virginia Cavaliers^Coastal Carolina Chanticleers^James Madison Dukes^Weber State Wildcats^Vanderbilt Commodores^Charleston Southern Buccaneers^Middle Tennessee Blue Raiders^Austin Peay Governors^North Alabama Lions^Arkansas State Red Wolves^Southeast Missouri State Redhawks^South Alabama Jaguars^Morgan State Bears^Troy Trojans^Nicholls Colonels^USC Trojans^Missouri State Bears^Louisiana Tech Bulldogs^SE Louisiana Lions^Utah State Aggies^UTEP Miners^BYU Cougars^Portland State Vikings^Louisiana Ragin' Cajuns^Rice Owls^Texas State Bobcats^Eastern Michigan Eagles^North Texas Mean Green^Lamar Cardinals^Tulsa Golden Hurricane^Abilene Christian Wildcats^New Mexico State Aggies^Bryant Bulldogs^Georgia Southern Eagles^Washington State Cougars^Idaho Vandals^Oregon State Beavers^California Golden Bears^Arizona Wildcats^UCLA Bruins^Utah Utes^Washington Huskies^Colorado State Rams^Miami Hurricanes^Notre Dame Fighting Irish^South Carolina Gamecocks^Virginia Tech Hokies^North Carolina Tar Heels^TCU Horned Frogs^Eastern Washington Eagles^Grambling Tigers^East Tennessee State Buccaneers^Cal Poly Mustangs^Northwestern State Demons^Howard Bison^Gardner-Webb Runnin' Bulldogs^Lindenwood Lions^Northern Iowa Panthers^Western Carolina Catamounts^Sacramento State Hornets^Texas Southern Tigers^North Carolina Central Eagles^Campbell Fighting Camels^Florida A+M Rattlers^North Carolina A+T Aggies^Northern Colorado Bears^Southern Illinois Salukis^McNeese Cowboys^UC Davis Aggies^Indiana State Sycamores^Colgate Raiders^Villanova Wildcats^Houston Christian Huskies^Towson Tigers^William + Mary Tribe^Samford Bulldogs^New Hampshire Wildcats^Norfolk State Spartans^Youngstown State Penguins^Richmond Spiders^Incarnate Word Cardinals^Alcorn State Braves^Monmouth Hawks^Murray State Racers^Prairie View A+M Panthers^Southern Jaguars^Wofford Terriers^Rhode Island Rams^The Citadel Bulldogs^Eastern Illinois Panthers^Mercer Bears^Furman Paladins^Southern Utah Thunderbirds^North Dakota State Bison^South Dakota State Jackrabbits^Utah Tech Trailblazers^Tennessee State Tigers^Sacred Heart Pioneers^West Georgia Wolves^UT Rio Grande Valley Vaqueros^Hampton Pirates^Mercyhurst Lakers^Mississippi Valley State Delta Devils^Stonehill Skyhawks^Montana Grizzlies|-4.2,6.3;-6.9,2;-5.2,13.5;-15.1,21.7;-6.1,8.3;-14.4,6.3;-13.2,12.2;-22.5,22;-12.7,11.3;-14.1,9;0.3,7.4;-8,6.3;-4.4,12.2;-12.4,8.6;-20.3,12;-25.5,21;-4.9,7.5;-7.9,5.4;-12,6.2;-14.4,14.2;-14.2,18.8;-22.8,26.3;-22.6,17.2;-20.6,18.1;-23.1,7;-5.7,0;-18.9,23.6;-1.2,10.8;-19.7,15.8;-18.8,13.6;-26.3,20.9;-12.2,4.8;-18.1,13.9;-8.1,5.9;-14.1,20.6;-15.3,23.2;-7.5,7.4;-6.9,5.7;-15.9,-0.2;-14.9,9.2;-13.3,4.2;-29.1,20.9;-4.6,2.9;-20.8,31.9;-15.6,3.9;-15.7,15.7;-9.4,9.3;-15.3,5.7;-10,5.5;-14.6,13.6;-22.7,18.1;-16.9,16.9;-30.2,28.9;-2.6,13;-8.5,0.3;-11.2,9.9;-4.4,5.8;-15.2,16.1;-24.2,26.8;-14.4,17.9;-18.4,12.5;1.1,-10.6;-2.5,-0.9;-1.8,0.1;-20,12.4;-7.2,2.4;-9,0.1;-1.1,-3.5;-10.6,14.7;5.2,-3.4;-11.5,22.2;-4.3,3.8;-0.3,-1.7;-8.8,2.9;-20.1,14.1;-4.2,0.6;-11.6,9.6;-9.3,0.9;-25,20.5;-3.5,2.5;-19.8,27.9;-12.4,11.8;-6.6,-4.1;-21.5,15.4;0.6,0.4;-4.2,12.3;9.2,-7.3;-8.9,4.1;4.3,2.2;-19.1,20.1;-18.9,18.3;2.5,-4.1;-23.9,33.8;3.1,8.5;-14.1,12.7;-15.3,15.4;-4.5,11;-11.4,8.3;-11.4,20.6;-12.7,11;-22.7,17.6;-9.7,4.6;-12.5,2.6;-3.1,7;-28.3,34.9;-9.1,7.6;-23.4,27.3;-17.7,22.6;-25.3,16.6;-10.4,4.9;-9.2,3.5;-11,12.2;-15,32.4;-11.1,10.9;-29.4,21;-8.9,14.1;-26.8,32.7;-4.3,3.5;-23.3,24.5;-11.3,14.9;-23.1,24.6;-26.1,26.5;-12.5,14.8;-22.2,11;-17.2,13.5;-15.7,14.5;-26.2,22.6;-1.6,11.2;-7.8,7.9;-4.5,-4.1;-18.3,15.4;-6.8,2.4;-16.1,18.6;-3.2,3.3;-20.3,16.2;3.6,4.5;-27.6,17.9;-19.5,19.7;-17.3,9.3;-27.5,27.7;-16.5,14;-21.4,20.7;-14.2,15.5;-24,23.5;-16.2,10.1;-23.3,17.5;2.2,2.8;-15.5,16.4;-16,10;-26.9,23.6;-7.7,14.2;-19.3,19.2;-2.5,-1;-22.8,27.5;-14.9,15.4;-22.4,14.8;-4.4,15.4;-15.9,18.4;4.9,13.5;-26.1,16.7;-17.2,16.6;-14.9,19.6;-20.8,16.6;-25.1,18.7;-12.4,17.6;-11.8,3.3;-16.7,4.5;-17.7,13.9;-11.9,10.5;-5.1,2.2;-12.4,8.7;3.4,0.5;-1,0.7;-18.2,14.6;-0.6,-6.3;6.8,-3.3;-9.5,1.3;-11.4,9.2;-16.2,8.5;-3.8,5.4;-17.3,28.1;-21.7,30.2;-23.4,29.1;-23.3,26;-28,45.9;-25.5,25.1;-15.5,23;-25.9,16.5;-23.3,21.4;-19.3,22.3;-13.9,16.2;-28.4,34.3;-21.8,26.5;-23.1,28.8;-24.7,25.7;-24.4,31.1;-20.3,20.1;-17.1,13.6;-26.8,24;-18.3,26.5;-28.3,31.2;-21,35.3;-18.6,22.2;-24.9,28.5;-18.5,22.5;-16.4,21.5;-23.7,16.9;-18,27.8;-29.1,30.3;-15.8,24.2;-22.5,23.5;-14.6,21.1;-32.8,29.6;-9,27.2;-26.5,27.7;-24.2,27;-18,29.1;-22.7,22.6;-16.2,26.2;-26.3,17.8;-23.9,21.5;-15.1,30.7;-17.8,25.6;-20.7,23.3;-12.1,10.6;-18.8,13.3;-17.2,31.4;-22.2,22.3;-22.4,17.7;;;;;;;|59,146,59,42,26;59,179,178,10,15,1;59,131,16,34,8;59,224,19,33,7;59,157,190,28,17;59,9,8,37,27;59,71,162,34,17;59,2,128,21,27;64,171,166,66,14;64,25,92,54,14;64,12,121,21,37;64,18,58,73,6;64,48,23,38,16;64,20,108,42,7;64,49,229,47,0;64,32,130,21,17;64,56,55,13,14;64,31,220,59,7;64,42,34,42,23;65,9,174,6,45;65,82,151,51,0;65,146,5,39,0;65,157,59,21,27;65,99,200,44,19;65,89,195,59,10;65,4,78,51,6;65,46,110,30,20;66,61,100,56,3;66,69,11,34,27;66,67,227,63,3;66,62,156,59,7;66,86,158,52,16;66,84,147,50,0;66,66,65,51,10;66,91,161,33,10;66,72,17,48,10;66,152,226,63,7;66,75,47,13,12;66,63,68,45,0;66,93,222,56,9;66,129,123,40,0;66,33,167,33,20;66,113,132,31,24;66,94,207,66,3;66,37,13,49,21;66,115,15,56,7;66,44,163,59,3;66,14,45,13,20;66,133,125,20,13;66,103,39,59,14;66,176,107,57,0;66,109,209,45,13;66,1,141,38,10;66,119,104,34,0;66,122,218,38,14;66,54,53,17,16,1;66,36,111,34,15;66,27,101,17,3;66,50,219,41,43;66,105,204,42,15;66,85,230,45,16;66,224,112,38,0;66,51,126,55,3;66,160,29,24,10;66,127,139,31,14;66,95,212,49,3;66,173,24,35,13;66,87,208,31,10;66,135,138,28,9;66,0,145,71,3;66,150,3,17,29;66,128,140,42,24;66,155,203,31,3;66,10,57,19,9;66,19,118,49,7;66,164,136,31,0;66,142,149,39,14;66,144,7,24,21;66,96,22,62,13;66,177,106,73,3;66,148,184,80,6;66,77,98,66,21;66,137,214,38,14;66,97,231,62,0;66,102,225,34,18;66,154,159,38,7;66,162,232,51,14;66,169,74,35,7;66,40,153,53,20;66,73,143,70,7;66,8,2,6,21;66,76,60,38,7;66,190,233,52,0;66,168,170,24,45;66,64,6,49,14;67,175,38,41,13,1;67,88,117,41,38,1;67,172,165,24,10;68,71,79,24,27;71,174,194,77,7;72,4,25,21,38;72,117,202,59,13;72,131,208,59,3;72,16,210,73,0;72,111,12,28,21;73,62,61,24,23;73,67,6,70,20;73,175,155,52,0;73,86,185,55,0;73,29,69,39,31;73,66,148,45,14;73,88,50,41,9;73,84,73,48,20;73,75,82,17,10;73,109,72,17,45;73,167,91,24,35;73,146,154,49,30;73,152,169,28,17;73,122,63,9,27;73,79,199,56,10;73,56,93,24,45;73,172,150,16,14;73,171,127,43,10;73,129,1,16,13;73,33,216,77,6;73,0,165,34,7;73,178,182,35,3;73,177,87,44,21;73,99,48,36,38;73,44,10,24,28;73,17,51,24,27;73,107,217,36,15;73,133,52,87,3;73,125,186,24,23;73,113,30,52,7;73,60,201,13,10;73,39,124,45,7;73,100,41,41,17;73,31,96,13,38;73,55,134,52,21;73,103,18,12,7;73,94,168,18,21;73,42,27,27,31;73,46,157,35,7;73,115,97,14,38;73,156,85,26,31;73,34,22,26,20;73,23,114,45,10;73,110,116,63,10;73,121,228,37,10;73,158,2,44,6;73,24,196,21,13;73,76,232,70,7;73,144,35,34,17;73,135,20,35,26;73,77,193,52,3;73,11,128,38,20;73,57,32,33,20;73,13,19,29,27;73,47,213,49,14;73,176,204,45,9;73,36,189,62,10;73,37,14,56,7;73,173,223,58,24;73,7,160,17,23;73,123,83,24,28;73,101,142,28,24;73,140,229,52,7;73,49,89,17,31;73,68,137,28,26;73,147,187,48,14;73,170,40,28,10;73,38,43,36,9;73,98,105,38,30;73,132,112,45,7;73,179,181,63,7;73,53,215,44,3;73,54,95,43,8;73,59,183,30,20;73,151,191,51,10;73,65,164,22,7;73,119,224,32,38;73,5,190,49,3;73,64,70,7,20;73,8,162,29,19;78,103,94,27,13;79,48,174,20,33;79,91,33,28,26;79,69,153,84,0;80,62,85,30,6;80,127,67,17,45;80,175,46,27,10;80,86,6,38,0;80,61,107,59,3;80,88,66,32,24;80,84,109,21,31;80,72,71,50,36;80,173,152,23,41;80,12,146,35,42;80,63,32,55,13;80,93,49,42,9;80,117,79,41,31;80,171,150,33,0;80,129,188,55,0;80,75,151,52,17;80,25,144,27,17;80,82,76,14,6;80,131,113,27,38,1;80,20,132,22,14;80,0,101,31,20;80,1,14,55,7;80,4,73,17,24,1;80,56,221,44,11;80,65,178,28,20;80,31,23,41,7;80,156,158,49,35;80,38,157,54,10;80,135,16,35,31;80,60,24,24,10;80,111,126,22,16;80,42,197,48,10;80,110,122,49,48;80,36,39,35,31;80,168,52,49,7;80,165,104,48,7;80,121,234,36,14;80,27,9,35,7;80,125,100,51,15;80,53,148,36,19;80,22,149,35,38;80,176,96,34,41;80,87,17,17,20;80,98,57,16,10;80,147,68,24,30;80,54,77,39,44;80,18,89,44,30;80,29,214,59,0;80,95,115,20,48;80,128,30,45,21;80,155,47,21,28;80,10,21,59,17;80,137,64,27,20;80,142,13,41,36;80,19,164,31,27;80,7,145,59,0;80,37,81,34,7;80,172,180,48,16;80,102,55,41,7;80,97,177,26,35;80,179,140,31,7;80,160,80,42,0;80,154,34,21,14;80,51,50,26,21;80,11,90,38,24;80,40,133,13,26;80,169,123,42,17;80,190,224,10,31;80,170,99,52,38;80,167,235,52,17;80,59,5,10,26;85,132,125,17,34;86,86,102,29,23;86,122,44,17,21;86,12,185,58,7;86,34,105,24,20;86,168,65,10,24;87,93,62,17,20;87,67,82,41,13;87,99,175,10,49;87,77,88,52,28;87,174,60,52,3;87,61,42,42,19;87,72,176,49,18;87,66,84,35,6;87,91,7,49,14;87,146,69,27,41;87,63,38,20,24;87,1,171,17,31;87,117,48,27,30;87,75,129,19,20;87,96,25,31,24;87,79,147,34,24;87,164,33,28,42;87,53,55,23,13;87,103,120,59,0;87,111,177,14,21;87,110,40,41,16;87,85,173,59,45;87,23,2,10,38;87,107,100,26,13;87,109,142,45,21;87,157,187,29,3;87,97,170,3,54;87,89,123,35,14;87,71,26,34,7;87,24,8,27,10;87,18,179,21,13;87,27,205,62,7;87,47,11,7,32;87,39,115,24,21;87,162,76,18,42;87,32,114,31,28;87,13,234,35,7;87,68,186,36,35;87,17,192,42,9;87,54,135,21,15;87,46,37,13,31;87,14,10,6,14;87,131,20,42,3;87,156,211,63,10;87,57,78,20,3;87,87,133,20,46;87,50,154,7,34;87,36,0,31,26;87,113,29,24,41;87,101,95,24,21;87,140,49,17,14;87,6,232,52,7;87,19,137,23,13;87,165,169,24,34;87,150,144,21,10;87,158,203,63,14;87,16,51,41,31;87,127,160,34,6;87,22,98,17,45;87,151,167,7,33;87,190,121,6,35;87,5,155,38,24;87,9,56,34,27;87,64,119,33,36;87,172,31,24,27;92,162,6,34,13;92,160,158,44,45;93,177,103,33,35;93,20,125,14,30;93,102,63,34,13;94,67,135,38,14;94,178,175,26,37;94,65,174,13,41;94,129,61,14,31;94,12,86,15,47;94,96,72,23,56;94,25,77,45,17;94,179,152,10,17;94,66,198,63,14;94,55,91,7,29;94,93,54,24,14;94,146,172,25,21;94,33,18,27,17;94,79,111,25,16;94,11,150,37,18;94,176,109,34,35;94,50,128,8,59;94,4,137,55,0;94,1,113,45,42;94,48,9,57,3;94,115,94,41,42;94,31,75,20,14;94,119,105,14,9;94,38,46,31,3;94,32,47,17,20;94,100,110,24,39;94,2,168,39,31;94,16,117,31,28;94,71,131,38,7;94,34,206,33,14;94,224,24,28,0;94,60,23,41,17;94,121,157,14,38;94,107,13,10,13;94,39,14,20,24;94,89,87,42,10;94,133,68,45,17;94,37,97,48,23;94,76,151,61,7;94,42,99,17,24;94,173,167,26,56;94,98,191,66,10;94,84,127,34,7;94,155,85,14,16;94,132,164,24,31;94,142,22,52,35;94,10,122,13,17;94,148,44,31,29;94,154,140,23,20;94,165,5,6,26;94,73,53,19,55;94,40,156,31,29;94,169,36,34,7;94,8,59,16,20;97,144,95,55,34;98,49,19,26,27;98,57,162,22,3;99,125,7,35,3;99,6,147,34,13;99,85,10,31,24;99,140,142,49,56;100,152,1,24,10;100,172,129,24,41;100,117,71,44,20;100,150,165,17,16;100,59,24,13,16;101,82,62,27,24,1;101,72,67,17,20;101,175,9,58,7;101,61,97,45,16;101,37,86,17,20;101,135,88,17,52;101,109,66,35,34;101,171,4,41,24;101,69,170,15,17;101,25,84,27,6;101,127,93,17,24;101,77,176,19,38;101,29,18,42,28;101,63,146,23,31;101,0,33,16,35;101,5,11,31,38;101,103,178,17,21;101,113,169,31,52;101,16,48,14,38;101,44,101,20,17;101,14,190,38,10;101,102,100,45,14;101,17,155,28,12;101,51,87,3,10;101,121,39,19,20;101,56,27,28,25;101,168,177,25,20;101,46,42,37,38;101,158,50,50,10;101,105,160,34,26;101,23,157,23,25;101,110,32,8,23;101,13,60,31,14;101,47,107,38,7;101,122,115,20,34;101,167,40,66,14;101,128,34,38,13;101,151,64,13,30;101,2,224,13,7;101,68,132,21,27;101,131,94,28,25;101,123,119,7,28;101,148,154,32,31;101,99,31,41,13;101,164,133,24,27;101,73,8,30,12;104,137,20,33,30;104,19,57,27,24;105,147,49,24,21;105,7,6,3,16;106,34,17,30,17;106,87,164,15,23;106,156,173,66,27;107,101,128,31,17;107,99,172,26,38;107,132,51,32,35;108,67,54,24,27;108,152,175,28,24;108,174,71,43,35;108,86,61,15,19;108,93,72,26,10;108,62,77,24,27;108,88,25,31,3;108,91,73,53,25;108,55,171,24,27;108,170,38,17,7;108,82,109,13,21;108,66,96,31,0;108,33,29,35,32;108,168,48,7,41;108,79,131,23,13;108,46,102,21,24;108,113,36,45,42;108,0,4,35,24;108,65,136,37,0;108,111,103,27,21;108,44,98,56,24;108,14,100,31,32;108,133,89,49,22;108,97,12,30,37;108,84,219,41,0;108,122,50,31,38;108,32,121,25,18;108,60,47,14,21;108,177,56,34,24;108,27,178,20,24;108,75,63,21,18;108,24,123,41,23;108,119,2,41,31;108,157,110,14,34;108,39,23,34,14;108,155,160,17,38;108,154,144,33,6;108,167,165,48,30;108,135,127,21,31;108,53,179,6,17;108,10,107,29,2;108,224,64,31,17;108,95,140,13,23;108,9,28,34,7;108,94,117,26,34;108,85,105,38,34;108,22,148,0,24;108,151,59,11,24;108,190,13,7,48;108,40,5,26,23;108,8,76,10,21;108,69,37,17,14;111,57,137,23,26;111,20,147,61,38;111,68,142,20,13;112,7,162,24,30;113,51,133,34,31;113,49,125,6,34;113,128,17,41,34;114,131,27,16,19;114,115,121,35,16;114,160,44,35,38;114,24,119,28,14;114,9,16,31,28;115,174,103,52,23;115,18,152,39,31;115,75,86,6,13;115,62,88,34,27;115,36,91,37,24;115,170,46,28,10;115,171,33,21,13;115,176,93,27,24;115,109,135,34,17;115,72,84,31,20;115,31,129,13,10;115,38,146,24,7;115,54,66,17,38;115,165,11,10,31;115,79,168,59,20;115,102,12,42,14;115,169,1,39,3;115,179,113,20,24;115,98,155,51,49;115,110,47,45,38;115,4,53,25,24;115,107,23,35,20;115,60,39,27,28;115,42,69,21,10;115,96,82,15,23;115,56,111,27,49;115,105,158,39,49;115,123,8,21,56;115,100,190,34,17;115,32,14,31,24;115,73,0,28,17;115,13,157,24,20;115,144,22,14,21;115,64,59,28,13;115,95,154,35,31;115,148,87,26,0;115,173,40,56,49;115,29,55,57,24;115,65,177,16,20;115,140,89,38,32;115,178,94,30,31;115,156,150,20,17;115,101,85,19,42;115,76,224,21,16;118,6,20,21,35;118,147,7,24,3;119,137,49,28,44;119,162,19,0,24;120,158,98,48,41;120,133,144,21,24;121,50,101,31,38;121,18,53,9,41;121,190,107,31,10;122,178,174,35,38;122,146,61,30,18;122,67,77,27,8,1;122,86,31,23,16;122,105,175,13,35,1;122,36,171,25,49;122,170,64,27,0;122,152,73,27,20;122,62,96,31,3;122,88,54,45,15;122,91,169,34,26;122,48,131,51,7;122,94,79,30,27;122,69,102,34,26;122,11,156,46,45;122,127,25,10,34;122,1,29,51,49;122,129,38,30,0;122,16,168,31,10;122,27,111,47,2;122,97,42,17,20;122,10,34,30,10;122,47,14,23,10;122,12,75,21,28;122,87,68,23,36;122,55,0,27,24;122,89,132,20,31;122,119,115,35,26;122,17,122,17,9;122,142,148,20,35;122,117,9,52,24;122,179,4,22,16;122,150,173,31,14;122,224,151,31,7;122,125,57,49,10;122,22,95,21,35;122,59,76,16,21;122,82,176,25,42;122,63,99,31,17;122,164,51,19,3;122,71,65,24,36;122,40,165,26,20;122,103,56,34,11;122,37,172,10,17;122,128,44,49,22;122,2,123,31,24;122,5,167,38,22;125,23,13,20,28;125,39,32,31,34;126,121,100,31,30;126,190,110,17,20;126,157,60,7,35,1;127,98,85,60,29;127,95,133,23,54;128,169,179,29,28;128,79,177,51,28;128,17,10,20,17;128,42,37,24,13;128,64,76,3,31;129,175,174,31,24;129,88,67,7,42;129,171,152,28,20;129,66,72,13,31;129,93,109,34,6;129,25,62,20,34;129,31,170,20,34;129,61,69,28,41;129,48,108,77,0;129,33,36,31,24;129,102,129,10,24;129,176,84,17,9;129,77,82,7,23;129,173,11,38,64;129,53,1,42,31;129,94,65,13,18;129,111,71,24,31;129,115,178,21,38;129,101,160,10,60;129,16,27,3,41;129,99,97,29,34;129,54,127,26,23;129,0,29,28,66;129,132,87,8,21;129,51,89,23,39;129,140,22,17,19;129,49,20,42,40;129,172,63,25,28;129,34,50,23,12;129,105,122,42,35;129,164,68,49,13;129,137,6,51,42;129,4,18,32,33;129,158,155,52,23;129,59,123,30,19;129,57,147,23,20;129,144,148,17,41;129,96,135,23,25;129,38,12,31,10;129,154,142,28,26;129,19,7,47,14;129,73,55,20,10;129,56,117,17,44;129,75,46,6,15;129,44,119,21,24;129,162,125,14,30", "nba": "nba|114.7|1.84|Oklahoma City Thunder^Houston Rockets^Los Angeles Lakers^Golden State Warriors^New York Knicks^Cleveland Cavaliers^Charlotte Hornets^Brooklyn Nets^Orlando Magic^Miami Heat^Atlanta Hawks^Toronto Raptors^Boston Celtics^Philadelphia 76ers^Chicago Bulls^Detroit Pistons^Memphis Grizzlies^New Orleans Pelicans^Milwaukee Bucks^Washington Wizards^Utah Jazz^LA Clippers^Dallas Mavericks^San Antonio Spurs^Phoenix Suns^Sacramento Kings^Portland Trail Blazers^Minnesota Timberwolves^Indiana Pacers^Denver Nuggets|2.5,-4.3;-1.6,-3.8;-0.6,-2.4;-0.8,0.4;-0.2,-7.2;1.2,-0.8;-0.8,-2.5;-6.2,0.3;-2,-2.7;3.3,2.9;2.5,1.3;-0.6,-1.6;-1.4,-5.8;-0.3,0;1.7,4.9;-0.6,-4.3;0.3,5.4;0.9,3.2;-1.9,1.6;-0.8,6.9;1.4,7.3;0.1,-1.5;0.6,4;2.4,-4.4;-1.3,-1.5;-0.9,3.2;-1.4,-1.7;0.2,-1.4;0.9,3.5;3.7,0.9|111,15,12,121,113;111,4,13,100,106;111,23,0,104,116;112,8,10,125,132;112,19,18,128,116;112,9,27,106,131;112,7,6,103,110;112,11,14,135,92;112,16,20,123,103;112,17,28,120,123;112,1,22,128,110;112,2,3,127,105;112,26,24,124,83;112,21,25,121,96;113,13,5,114,106;113,0,29,96,84;114,18,14,125,132;114,12,4,107,103;114,6,10,81,128;114,28,22,105,121;114,8,27,93,115;114,19,11,102,112;114,9,15,111,128;114,23,1,110,114;114,20,17,120,119;114,3,16,108,111;114,2,21,125,117;114,25,26,120,128;115,6,9,115,110;115,5,7,125,121;115,13,18,127,116;115,14,19,120,124;115,22,23,106,122;115,10,1,114,121;115,29,17,141,135;115,24,3,131,122;116,20,2,123,132;116,7,28,109,136;116,4,8,102,111;116,27,11,117,94;116,0,21,108,101;116,13,15,93,106;116,25,16,112,123;117,6,19,110,103;117,5,27,127,125;117,12,14,134,99;117,9,22,109,113;117,18,28,110,102;117,0,24,125,114;117,1,10,120,110;117,20,16,105,110;117,29,3,114,134;118,12,7,125,124;118,4,15,111,97;118,23,25,130,103;118,2,26,129,136;119,10,9,117,129;119,5,19,121,111;119,15,6,97,89;119,28,13,109,114;119,11,8,129,99;119,14,4,127,133;119,18,1,100,132;119,27,3,114,119;119,17,29,91,104;119,20,23,111,117;119,22,0,120,96;119,21,2,87,103;120,10,5,114,111;120,17,25,132,120;120,26,16,103,124;121,19,6,95,79;121,12,14,125,111;121,7,15,94,110;121,13,4,98,93;121,11,8,114,121;121,9,28,145,125;121,22,1,116,111;121,27,21,127,101;121,3,2,112,95;121,24,29,120,127;122,20,26,90,112;122,6,13,104,109;122,17,10,121,99;122,16,25,136,105;122,18,5,111,136;122,23,27,121,111;122,1,0,119,98;123,8,12,97,108;123,28,7,90,98;123,3,21,124,112;123,2,11,131,125;124,5,0,112,117;124,6,15,91,124;124,28,10,104,108;124,4,7,103,90;124,8,19,94,103;124,13,14,126,107;124,22,25,100,115;124,16,17,134,135;124,27,18,112,100;124,1,12,109,93;124,23,20,119,97;124,29,26,110,118;124,3,24,116,113;124,21,11,118,125;124,2,9,138,117;126,15,13,106,112;126,19,10,105,120;126,12,18,109,102;126,7,6,114,104;126,4,14,135,105;126,16,28,103,107;126,17,20,120,113;126,0,5,124,116;126,1,27,107,117;126,29,11,128,109;126,24,26,119,132;126,23,22,112,111;126,25,2,103,116;126,21,9,116,117;127,24,8,117,104;127,3,9,120,100;128,10,19,139,132;128,6,12,80,119;128,5,13,119,95;128,22,20,112,100;128,16,0,97,128;128,18,11,107,121;128,17,27,109,115;128,2,26,124,118;128,25,23,109,124;129,28,29,102,114,1;129,10,7,124,121;129,5,4,97,109;129,0,19,114,75;129,3,8,126,119;129,24,1,102,99", "nhl": "nhl|3.11|0.1|Florida Panthers^Chicago Blackhawks^New York Rangers^Pittsburgh Penguins^Los Angeles Kings^Colorado Avalanche^Toronto Maple Leafs^Montreal Canadiens^Washington Capitals^Boston Bruins^Edmonton Oilers^Calgary Flames^Vegas Golden Knights^Buffalo Sabres^Detroit Red Wings^Tampa Bay Lightning^Ottawa Senators^Philadelphia Flyers^New York Islanders^Carolina Hurricanes^New Jersey Devils^St. Louis Blues^Minnesota Wild^Nashville Predators^Columbus Blue Jackets^Winnipeg Jets^Dallas Stars^Utah Mammoth^Vancouver Canucks^San Jose Sharks^Seattle Kraken^Anaheim Ducks|0.01,0.03;-0.23,0.15;-0.06,-0.04;0.14,0.09;-0.16,-0.08;0.25,-0.24;0.02,0.17;0.1,-0.02;0.06,-0.07;0.03,-0.02;0.15,0.08;-0.23,0.01;0.09,-0.08;0.17,-0.04;-0.07,0.02;0.17,-0.16;0.07,-0.07;-0.08,-0.07;-0.13,-0.06;0.22,-0.18;-0.12,-0.04;-0.1,0;0.09,-0.06;-0.07,0.08;0.01,0.02;-0.09,-0.04;0.11,-0.14;0.05,-0.05;-0.19,0.27;-0.08,0.26;-0.15,0.05;0.04,0.18|92,24,13,6,3;92,20,17,3,2;92,2,15,5,1;92,23,22,1,3;92,11,30,1,6;92,27,1,6,0;92,29,0,4,3;92,28,10,7,9;93,14,2,0,2;93,19,8,2,5;93,25,9,3,4;93,26,21,0,4;93,12,31,3,4;94,13,1,4,3;94,3,7,6,5;94,15,8,3,1;94,6,16,2,3;94,17,19,2,3;94,24,27,1,4;94,10,30,3,1;94,18,20,6,0;94,22,9,4,1;94,23,26,2,1;94,5,21,6,1;94,28,11,4,1;94,29,4,5,4;95,14,25,2,3;95,2,27,4,2;95,31,0,3,2;95,30,11,6,1;95,28,12,2,3;96,15,17,4,1;96,9,16,1,4;96,3,25,2,3;96,26,29,5,0;97,7,19,4,6;97,6,23,5,4;97,14,16,5,3;97,20,27,3,5;97,13,22,3,2;97,2,18,5,2;97,1,21,4,2;97,30,12,2,6;97,4,0,1,2;98,8,3,5,3;98,25,5,3,2;98,31,10,2,5;99,16,17,2,1;99,9,27,6,1;99,13,26,0,4;99,7,23,2,5;99,15,22,3,2;99,19,28,7,2;99,18,1,4,1;99,21,29,2,3;99,11,5,3,7;99,12,6,4,3;100,14,30,3,6;100,8,2,3,1;100,24,3,3,2;100,25,31,1,5;101,9,17,5,1;101,20,28,4,1;101,29,10,1,3;101,0,22,1,4;101,13,27,1,4;101,7,14,1,0;101,16,23,3,2;101,3,26,2,1;101,1,19,2,5;101,21,24,5,3;101,5,6,3,6;101,18,15,3,5;101,11,31,2,4;101,12,4,2,1;102,8,30,3,5;102,2,28,6,2;102,17,19,1,4;103,13,0,5,3;103,20,16,1,4;103,22,12,4,2;104,14,20,4,5;104,24,0,3,7;104,7,13,4,3;104,19,8,4,2;104,17,30,2,3;104,2,15,4,1;104,16,21,2,7;104,18,28,3,2;104,1,3,5,3;104,25,22,5,2;104,26,5,2,3;104,23,12,2,5;104,27,6,5,4;104,31,11,2,4;104,4,10,1,4;104,29,9,3,6;105,8,7,5,4;105,5,26,2,3;106,6,13,4,5;106,16,18,2,1;106,15,30,4,3;106,0,28,3,2;106,20,2,7,1;106,14,17,2,1;106,1,25,4,3;106,23,29,2,3;106,22,21,5,4;106,10,27,2,4;106,12,11,6,2;107,5,3,5,2;107,31,9,2,4;108,8,20,4,2;108,25,19,2,3;108,15,28,4,2;108,0,30,8,3;108,6,18,1,4;108,7,13,4,3;108,14,29,4,3;108,17,16,3,1;108,24,2,1,0;108,1,26,0,4;108,23,21,5,2;108,4,9,1,4;108,27,10,2,6;108,12,3,6,2;109,22,24,2,1;109,11,19,3,2;110,2,31,5,2;110,17,5,3,2;110,6,29,3,1;110,27,3,5,4;111,7,29,3,4;111,20,5,4,3;111,18,31,3,2;111,8,4,2,5;111,24,6,2,6;111,21,25,2,1;111,26,9,3,2;111,10,22,4,3;111,30,14,4,3;111,28,19,3,6;111,12,15,2,6;112,13,17,1,3;112,16,0,5,1;113,9,23,6,0;113,6,2,5,4;113,16,29,2,6;113,20,31,4,1;113,3,0,4,0;113,18,4,2,3;113,21,12,6,2;113,26,25,3,2;113,11,22,2,1;113,10,19,6,5;113,30,27,5,3;113,28,14,2,5;114,1,7,1,4;114,5,15,6,3;115,17,31,4,5;115,20,4,3,1;115,9,29,6,4;115,16,2,7,4;115,3,23,3,2;115,8,13,4,3;115,24,12,2,1;115,21,19,0,4;115,10,6,2,7;115,27,15,5,4;115,11,14,4,1;115,30,22,1,5;116,1,0,2,3;116,26,18,6,3;116,25,7,1,2;116,23,5,6,2;116,28,22,2,4;117,2,4,3,6;117,11,6,5,2;117,10,14,3,4;118,17,24,3,4;118,19,9,2,1;118,1,4,2,1;118,21,7,0,2;118,23,18,3,4;118,26,20,1,5;118,25,0,1,5;118,27,22,1,3;118,12,16,4,1;118,31,28,5,6;118,29,13,0,2;119,8,17,5,2;119,10,11,4,0;119,5,20,5,2;119,30,6,5,4;120,15,25,6,4;120,3,27,3,4;120,19,24,3,2;120,14,1,4,1;120,21,9,4,1;120,23,8,3,4;120,26,7,2,5;120,22,18,3,4;120,31,13,6,7;120,4,16,6,5;120,29,28,3,2;121,12,20,2,5;121,0,25,5,2;121,11,30,6,2;122,9,1,5,4;122,14,21,4,5;122,23,15,5,4;122,18,10,0,4;122,4,13,2,3;122,29,16,1,5;122,7,3,5,4;122,28,6,2,4;122,26,24,3,1;122,5,11,5,2;123,19,25,7,0;123,8,22,1,5;123,17,27,6,3;123,2,10,1,4;123,31,16,6,3;124,9,12,3,2;124,0,14,3,5;124,1,5,2,5;124,29,11,1,2;125,6,27,2,3;125,7,25,4,5;125,15,14,4,2;125,2,21,3,1;125,17,22,2,4;125,3,12,2,3;125,8,26,5,6;125,24,5,7,2;125,20,10,4,3;125,23,19,4,1;125,28,31,4,5;126,13,16,1,2;126,0,1,5,3;126,4,29,7,2;126,30,11,2,1;127,7,27,5,4;127,14,12,1,2;127,15,1,4,1;127,20,21,5,4;127,18,19,3,5;127,2,17,3,2;127,3,9,2,6;127,24,26,2,1;127,25,28,6,2;127,10,31,4,5;127,5,23,2,3;128,13,24,5,2;128,22,29,4,1;128,11,31,3,5;129,8,0,4,3;129,23,21,3,1;129,30,2,3,4;129,6,7,2,4;129,16,27,4,2;129,18,20,4,5;129,19,1,9,2;129,26,29,4,3;129,22,15,3,4;129,5,14,4,0;129,4,3,2,5", "cbb": "cbb|77.36|2.97|Houston Cougars^Lehigh Mountain Hawks^Arizona Wildcats^Florida Gators^UConn Huskies^New Haven Chargers^St. John's Red Storm^Quinnipiac Bobcats^Michigan Wolverines^Oakland Golden Grizzlies^BYU Cougars^Villanova Wildcats^Louisville Cardinals^South Carolina State Bulldogs^UCLA Bruins^Eastern Washington Eagles^Arkansas Razorbacks^Southern Jaguars^Alabama Crimson Tide^North Dakota Fighting Hawks^Iowa State Cyclones^Fairleigh Dickinson Knights^Illinois Fighting Illini^Jackson State Tigers^Tennessee Volunteers^Mercer Bears^Kansas Jayhawks^Green Bay Phoenix^Auburn Tigers^Bethune-Cookman Wildcats^Gonzaga Bulldogs^Texas Southern Tigers^Michigan State Spartans^Colgate Raiders^Wisconsin Badgers^Campbell Fighting Camels^North Carolina Tar Heels^Central Arkansas Bears^Winthrop Eagles^Queens University Royals^St. Bonaventure Bonnies^Bradley Braves^East Texas A+M Lions^Lamar Cardinals^Prairie View A+M Panthers^College of Biblical Studies Ambassadors^Murray State Racers^Omaha Mavericks^Stephen F. Austin Lumberjacks^Drake Bulldogs^Northern Arizona Lumberjacks^Stonehill Skyhawks^Drexel Dragons^VMI Keydets^Eastern Michigan Eagles^Georgia State Panthers^Stony Brook Seawolves^High Point Panthers^Furman Paladins^Buffalo Bulls^Southern Miss Golden Eagles^Ohio State Buckeyes^IU Indianapolis Jaguars^Maryland Terrapins^Coppin State Eagles^Georgetown Hoyas^Morgan State Bears^Miami (OH) RedHawks^Old Dominion Monarchs^The Citadel Bulldogs^Erskine Flying Fleet^Chattanooga Mocs^Howard Bison^Missouri Tigers^Western Michigan Broncos^Coastal Carolina Chanticleers^Ohio Bobcats^Arkansas State Red Wolves^Florida International Panthers^Norfolk State Spartans^Davidson Wildcats^Morehead State Eagles^Midway Eagles^Liberty Flames^Kentucky Christian Knights^Kennesaw State Owls^Jacksonville State Gamecocks^Oakwood Ambassadors^William + Mary Tribe^Charleston Cougars^Massachusetts Minutemen^Marshall Thundering Herd^Longwood Lancers^Le Moyne Dolphins^Vermont Catamounts^UMass Lowell River Hawks^Rivier Raiders^George Mason Patriots^Wofford Terriers^Radford Highlanders^Western Illinois Leathernecks^UNC Wilmington Seahawks^Mount Olive Trojans^Toledo Rockets^South Alabama Jaguars^Central Michigan Chippewas^App State Mountaineers^Bowling Green Falcons^Texas State Bobcats^Wright State Raiders^Northern Kentucky Norse^Florida Gulf Coast Eagles^New College Mighty Banyans^Penn State Nittany Lions^Fairfield Stags^Kent State Golden Flashes^Troy Trojans^VCU Rams^Wagner Seahawks^Saint Joseph's Hawks^Lafayette Leopards^Ball State Cardinals^Louisiana Ragin' Cajuns^Siena Saints^Bryant Bulldogs^Akron Zips^James Madison Dukes^Cincinnati Bearcats^Western Carolina Catamounts^Virginia Tech Hokies^Charleston Southern Buccaneers^Syracuse Orange^Binghamton Bearcats^Pittsburgh Panthers^Youngstown State Penguins^NC State Wolfpack^North Carolina Central Eagles^Florida Atlantic Owls^Boston College Eagles^Rhode Island Rams^Stetson Hatters^Duquesne Dukes^Niagara Purple Eagles^Dayton Flyers^Canisius Golden Griffins^Clemson Tigers^New Hampshire Wildcats^Central Connecticut Blue Devils^Virginia Cavaliers^Rider Broncs^Notre Dame Fighting Irish^Long Island University Sharks^Bucknell Bison^Delaware Blue Hens^Xavier Musketeers^Marist Red Foxes^Providence Friars^Holy Cross Crusaders^McNeese Cowboys^Champion Christian Tigers^Grambling Tigers^Seton Hall Pirates^Saint Peter's Peacocks^UAB Blazers^Mississippi Valley State Delta Devils^Northeastern Huskies^Boston University Terriers^Western Kentucky Hilltoppers^Tennessee Tech Golden Eagles^Sam Houston Bearkats^Georgia Bulldogs^Bellarmine Knights^Georgia Tech Yellow Jackets^Maryland Eastern Shore Hawks^Presbyterian Blue Hose^Navy Midshipmen^Belmont Bruins^Air Force Falcons^Kansas City Roos^Texas A+M Aggies^Northwestern State Demons^Tennessee State Tigers^Fisk Bulldogs^Southern Illinois Salukis^Houston Christian Huskies^Tulsa Golden Hurricane^Alabama A+M Bulldogs^Blue Mountain Christian Toppers^Minnesota Golden Gophers^Gardner-Webb Runnin' Bulldogs^Army Black Knights^UC Davis Aggies^Menlo Oaks^Nebraska Cornhuskers^West Georgia Wolves^Vanderbilt Commodores^Lipscomb Bisons^UT Arlington Mavericks^UNT Dallas Trailblazers^Northern Illinois Huskies^UL Monroe Warhawks^UIC Flames^Detroit Mercy Titans^Marquette Golden Eagles^UAlbany Great Danes^DePaul Blue Demons^Chicago State Cougars^Milwaukee Panthers^Hampton Pirates^Charlotte 49ers^Indiana State Sycamores^Northwestern Wildcats^Mercyhurst Lakers^Baylor Bears^UT Rio Grande Valley Vaqueros^Wake Forest Demon Deacons^American University Eagles^SMU Mustangs^Tarleton State Texans^Saint Louis Billikens^Southeast Missouri State Redhawks^Loyola Chicago Ramblers^Cleveland State Vikings^George Washington Revolutionaries^Maine Black Bears^Miami Hurricanes^Jacksonville Dolphins^Ole Miss Rebels^SE Louisiana Lions^TCU Horned Frogs^LSU New Orleans Privateers^Austin Peay Governors^North Texas Mean Green^Tulane Green Wave^Samford Bulldogs^Wyoming Cowboys^Texas A+M-Corpus Christi Islanders^Oklahoma Sooners^South Dakota Coyotes^Utah Tech Trailblazers^South Florida Bulls^Florida A+M Rattlers^UCF Knights^Hofstra Pride^Merrimack Warriors^South Dakota State Jackrabbits^UTEP Miners^Montana Grizzlies^Utah State Aggies^Weber State Wildcats^West Coast Baptist Eagles^Pepperdine Waves^Boise State Broncos^Colorado State Rams^Incarnate Word Cardinals^Abilene Christian Wildcats^Grand Canyon Lopes^Purdue Fort Wayne Mastodons^Loyola Maryland Greyhounds^Towson Tigers^Utah Utes^San Jos\u00e9 State Spartans^Colorado Buffaloes^Montana State Bobcats^USC Trojans^Cal Poly Mustangs^Northern Colorado Bears^Colorado College Tigers^Oregon State Beavers^North Dakota State Bison^Washington State Cougars^Idaho Vandals^UC Irvine Anteaters^Bethesda Flames^Saint Mary's Gaels^St. Thomas Tommies^UC San Diego Tritons^La Verne Leopards^San Francisco Dons^UC Riverside Highlanders^La Sierra Golden Eagles^Seattle U Redhawks^Denver Pioneers^Portland Pilots^Willamette Bearcats^Loyola Marymount Lions^Lincoln (CA) Oaklanders^Cal State Northridge Matadors^Cal State Fullerton Titans^California Golden Bears^Cal State Bakersfield Roadrunners^Fresno State Bulldogs^Fresno Pacific Sunbirds^California Baptist Lancers^South Carolina Upstate Spartans^Washington Huskies^Arkansas-Pine Bluff Golden Lions^Purdue Boilermakers^Evansville Purple Aces^Duke Blue Devils^Texas Longhorns^Kentucky Wildcats^Nicholls Colonels^Texas Tech Red Raiders^Lindenwood Lions^UMBC Retrievers^SIU Edwardsville Cougars^East West Phantoms^South Carolina Gamecocks^North Carolina A+T Aggies^Florida State Seminoles^Alcorn State Braves^East Tennessee State Buccaneers^Monmouth Hawks^Manhattan Jaspers^Sacred Heart Pioneers^Fordham Rams^NJIT Highlanders^East Carolina Pirates^Georgia Southern Eagles^West Virginia Mountaineers^Mount St. Mary's Mountaineers^Wichita State Shockers^UNC Asheville Bulldogs^Utah Valley Wolverines^Rice Owls^Little Rock Trojans^Missouri State Bears^Valparaiso Beacons^Eastern Illinois Panthers^Kansas State Wildcats^UNC Greensboro Spartans^Oklahoma State Cowboys^Oral Roberts Golden Eagles^Iowa Hawkeyes^Robert Morris Colonials^New Mexico State Aggies^Adams State Grizzlies^UC Santa Barbara Gauchos^San Francisco State Gators^San Diego Toreros^Arizona State Sun Devils^Southern Utah Thunderbirds^Sacramento State Hornets^Nevada Wolf Pack^Louisiana Tech Bulldogs^Santa Clara Broncos^Idaho State Bengals^San Diego State Aztecs^Long Beach State Beach^UNLV Rebels^UT Martin Skyhawks^Stanford Cardinal^Portland State Vikings^Oregon Ducks^Hawai'i Rainbow Warriors^Creighton Bluejays^Middle Tennessee Blue Raiders^Milligan Buffaloes^Rutgers Scarlet Knights^La Salle Explorers^UTSA Roadrunners^Mississippi U for Women Owls^Elon Phoenix^Temple Owls^Delaware State Hornets^LaGrange Panthers^Butler Bulldogs^Southern Indiana Screaming Eagles^Richmond Spiders^Southern Virginia Knights^Indiana Hoosiers^LSU Tigers^New Mexico Lobos^Mississippi State Bulldogs^North Alabama Lions^Pacific Tigers^North Florida Ospreys^Whittier Poets^Curry Colonels^Randolph Wildcats^Illinois State Redbirds^Eastern Kentucky Colonels^Tougaloo Bulldogs^Northern Iowa Panthers^Calumet St. Joseph Crimson Wave^Columbia Lions^Harvard Crimson^MIT Engineers^Virginia Lynchburg Dragons^Alabama State Hornets^Iona Gaels^Lane College Dragons^Cornell Big Red^Brown Bears^Pennsylvania Quakers^Mount St Mary Knights^Western New Mexico Mustangs^Yale Bulldogs^Jessup Warriors^Princeton Tigers^Memphis Tigers^Cheyney (PA) Wolves^Webster Gorloks^Northwestern (OK) Rangers^Dartmouth Big Green^Lyon Scots^Reinhardt Eagles^Columbia International Rams^Penn State Shenango Nittany Lions^Southwestern Christian U Eagles^St. Joseph's Long Island Golden Eagles^St. Francis (IL) Fighting Saints^Bob Jones Bruins^Fort Valley State Wildcats^Boyce Bulldogs^City College NY Beavers^Dallas Christian Crusaders^Howard Payne Yellow Jackets^Schreiner Mountaineers^Notre Dame (MD) Gators^Texas Lutheran Bulldogs^Central State Marauders^Trinity College of Jacksonville Eagles^Lawrence Vikings^Mid America Christian Evangels^Regis University REGIS UNIVERSITY^Louisiana Christian Wildcats^Eureka Red Devils^Saint Mary of the Woods Pomeroys^Mount Marty Lancers^Pfeiffer Falcons^Warren Wilson Owls^Lewis + Clark River Otters^Christendom Crusaders^Roberts Wesleyan Redhawks^Cameron Aggies^Southern Wesleyan Warriors^SUNY Old Westbury Panthers^Salish Kootenai Bison^George Fox Bruins^Crookston (MN) Golden Eagles^Miami (OH) Middletown ThunderHawks^Stanton Elks^Morris Hornets^Paul Quinn Tigers^Framingham State Rams^Newberry Wolves^Western Colorado Mountaineers^Union (TN) Bulldogs^Chapman Panthers^Loyola New Orleans Wolfpack^Monmouth (IL) Fighting Scots^Texas A+M-Kingsville Javelinas^Lincoln (MO) Blue Tigers^Kentucky Wesleyan Panthers^North American Stallions^Coast Guard Bears^Berry Vikings^Rhode Island College Anchormen^Bridgewater Eagles^Saint Vincent Bearcats^Truman State Bulldogs^Alma Scots^Carnegie Mellon Tartans^West Florida Argonauts^Southeastern Baptist Chargers^IU Kokomo Cougars^Regent Regent Royals^Ottawa (KS) Braves^Maryville (MO) Saints^Biola Eagles^Cal State San Marcos Cougars^Cornell (IA) Rams^Concordia Chicago Cougars^Central College Dutch^Grace University Lancers^King's Monarchs^Central Bible Saints^Kalamazoo Hornets^Arkansas Monticello Boll Weevils^Centre Colonels^Michigan Dearborn Wolves^Briar Cliff Chargers^Andrew Fighting Tigers^Albion Britons|8.3,-23.7;-1.3,-2.3;18.7,-17.2;17.6,-15.5;9.3,-20.1;-9.5,-8;13.4,-15.2;2.8,-3.3;20.8,-16.8;9.5,0.5;16.9,-9;8.6,-14;15.2,-11.6;-6.9,1;9.4,-14.3;5.4,-1.7;21.1,-6.4;2.9,1.3;23.8,-5.3;0.9,-1.3;13.5,-18.2;-6.6,-3.9;16.3,-15.6;-1.3,3.7;9.3,-18.6;6.3,-1.8;9.7,-16.7;-0.1,-5.9;14.6,-8.5;1.6,-2;12.7,-16;-0.7,0.8;11.3,-18;2.7,-2.3;16.2,-9.3;6.2,-0.7;11.6,-12.4;3.8,-4.8;7,-2.5;9.7,3;5.8,-4.9;6.7,-5.3;-3,-2.6;-3.5,-7.7;0.2,-0.3;-10.3,15.4;11.7,0;0.4,-2.8;3,-10;3.1,-4.5;-4.3,-3.4;-8.6,-6.4;-5,-10.8;-5.9,2.6;-2.7,-7.2;-3.5,-3.4;-1.1,-5.3;11.9,-3.4;0.6,-7.1;4.2,-2.3;1.5,-3.9;12.6,-12.1;7.3,8.5;3.4,-8.9;-7.6,3.1;5.8,-10.4;-0.7,5.3;12.6,-2.7;2.1,-1.6;-5.3,-0.2;-12.7,14.4;-0.3,-1.5;2.8,-5;9.2,-10.7;1.5,-0.4;-2,-5.6;4.2,-0.9;9.4,-0.8;6.5,0.2;-0.5,-0.5;0.6,-11.3;-1.2,-1.4;-5.4,16.3;3.9,-7.6;-5.3,16.4;8.3,-1.3;-2.4,-8.4;-4.3,24.7;9,-0.8;2.8,-5.7;6.4,-1;6.2,-0.7;1.6,-1.7;-0.2,-1.2;-1.3,-6;0.5,1;-10.5,16.7;1,-13.2;2.7,-1.1;4.7,1.2;-9.3,1.3;1.2,-10.6;10.1,29.1;6.7,-4.2;-0.5,-7.6;-0.2,-2.8;-4.8,-11.2;3.3,-6.8;-2,-5.3;4.5,-6.2;6.2,-2.2;1,-3.3;-8.6,17.2;6.4,-4.7;0.4,-3.1;8.7,-0.9;3.9,-5.9;11.1,-9.6;-2.8,-2.7;2.6,-9.1;-3.9,-2.1;-7.9,-9;-9,-7.5;-1.4,-9.3;-7.7,-3.1;12.9,-5;1.2,-4.5;4.7,-17;2.9,-1.2;9.8,-9.1;5.5,2.1;7.6,-8.3;-6.2,1.3;2.4,-12.4;1,-6;14.6,-7.9;-3.5,0.7;6.8,-4.9;-1.7,-11.6;-0.5,-11.2;-1.3,0;6.4,-4.4;-9.3,-5.6;4.1,-12.7;-9.8,-5.4;5,-17.4;-4.5,-0.6;-2.5,-3.1;11.2,-15.4;-7.9,-1.1;6.7,-8.5;0.5,-5.3;-4.7,-2.2;-4.1,-4.6;11.4,-3.3;-4.5,-11.9;17.5,0;-5.9,-3.6;5.8,-10.4;1.2,29.2;-5.7,-6.4;1.2,-18.7;-2.9,-6.9;5.9,-5.5;-10.6,3.6;3.7,2.2;0.8,-2.3;5.2,-4;-2.3,-1.6;8.3,-3.5;18.8,-5;4,2;4.8,-4.6;-10.2,-6.3;-4.4,-6.8;-0.6,-10;11.8,-5.4;-8.4,-3;-5.8,2.5;15.9,-6.9;-4.7,-5.1;5.9,-0.7;-12.6,11.6;1.8,-10.1;-5.6,-5.4;12.4,-6.3;-4.5,-3.1;-8.2,14.6;0.8,-15.5;-5.3,5.6;-2.6,1;2.7,-5;-3.8,11.4;9.3,-18.5;-0.4,-0.1;16.8,-11.7;3.7,-3.5;-3.7,-12.2;-13.1,4.9;-5.7,-2.1;-0.5,6.3;3.3,-9.1;2.6,-2.4;7.1,-8.9;-3.3,-2.3;0.6,-13.5;-5.7,-1;1.4,-2;-3.4,-6.1;1.4,-6.1;2.6,-3.8;5.8,-12.9;-5.2,-6.9;12.4,-8;2.7,-7.2;9.8,-7.7;-0.6,-4.6;14,-7.8;1.2,-4.1;15.1,-8.8;-0.4,-4.9;-2.6,-4.6;4.6,5.9;10.3,-5.7;-11.4,-7.4;11.2,-11.8;-5.2,-5.6;6.1,-11.6;-6.2,-6.9;7.9,-13.1;4.7,-0.7;3.8,-4.5;-2.6,-12.9;0.9,-4.3;3.2,-3;5.3,-9.1;-2.8,-9.6;12.5,-8.8;4,2.7;3.6,-2.8;14.7,-5.8;-5.3,-3.5;13.1,-6.3;2.7,-11.7;-3.1,-10.5;1.6,-5;-4.1,-6.5;2.2,-4.7;12.6,-11.6;5.2,-1.3;-5.7,17.7;0.5,-1.1;8.2,-9.8;4.5,-11.1;0.3,-2.2;-3.5,-6.6;5,-13.1;1.3,-2.4;0.6,1.8;-3.6,-13;6,-6.4;1.7,-3.5;11.4,-5.7;2.3,-8;10.7,-6.2;9.8,5.1;7.7,-2.3;-15.7,1.3;1.3,-7;5,-7.6;6.1,-4.1;2.5,-6.9;1.1,-11;-3.9,21.3;6.6,-17.4;6.5,-6.4;0.9,-10;-1.5,18.6;4,-7.6;-0.2,-2.9;-21.2,2.6;-0.9,-13;7.8,2.7;2.1,-3;4.2,28.4;0.8,-7.7;3,28.4;8.3,1.1;7.8,0.6;7.5,-9.2;-1,2.6;2,-8.6;-10,5.1;0.4,-11.8;-2.3,-3.1;8.6,-11.6;0.9,2.9;14.7,-16.2;-3.5,-3.4;13.7,-21.3;13,-10.3;11.9,-12.5;0.5,-2.6;12.5,-14.8;1.7,-1.1;0.9,-6.2;-6.4,-9.5;-5.5,27.5;4.6,-9.9;0.9,-0.1;11.6,-6.1;-5.5,0.3;1.9,-7.9;0.9,-7;0.7,3.6;2.5,1.7;-3.4,-11.8;-5.5,-2.8;-0.2,-2.8;6.5,2.4;1.3,-18.4;-3.8,-5.7;6.2,-10.5;-3.3,-6.9;5.9,-8.3;0,-4.4;-2.9,-2.2;1,-5.3;0.5,-8.2;-7,-5.5;11,-3.1;1.9,2;15.2,-1.8;-2,-1.9;7.6,-17.5;1.8,-7.6;1.4,-6;1.5,5.9;3.1,-6.4;-12.8,8.9;2.7,-1.3;8.9,-8.4;3.9,1.5;4.1,2.3;6.5,-10.8;-5.7,-11.9;14.3,-8;0.6,-3.2;8.3,-11.9;0.6,-2.4;9.4,-3.5;-6.9,-12;7.8,-10.2;0.6,-8.9;3.9,-11;4.1,-8.7;7.8,-8.9;2.5,-6.5;1.1,20.1;4,-7.7;-1.9,-6.8;-3.5,0.8;-19.2,16.7;4.3,-0.6;2,-7.2;-13.9,-4.8;-7.6,14.5;10.6,-6.1;-6.1,-1.7;4.3,-5.6;-13.5,10;10.5,-11.7;11.4,-7.5;10.9,-10.2;8.3,-5.4;-6,-1.8;0.3,-11.6;5,8.4;-5.4,15.9;-14.9,12.6;-12.9,7.7;2.5,-12;3.8,2.4;-6,6.8;-2.2,-18.4;-12.9,15.2;2.6,-5.3;-3.2,-12.2;-8.8,3.7;-0.2,31.2;-2,-0.3;1.9,-2.3;4,15.4;15.7,5.9;-5.2,-6.4;4.1,-4.9;-13.4,13.3;-0.1,24.6;7.9,-7.9;-5.6,8.4;-4.1,-7.6;4.9,-6.5;-6.5,24.1;-11,8.6;-5.3,11.6;1.9,-0.8;-15,8.5;-14.6,11.2;-9.7,13;-9.1,15.5;-8.4,20.8;-12.5,15.9;-13.4,5.9;-9.5,17.2;-7.9,17.7;-5.7,24.1;-4.3,16.5;-12.1,16.2;6.3,31.1;-10.2,13;-4.4,19.1;-13.6,14.9;-4.5,11.6;-5.6,23.9;-10.7,2.8;-8.4,2.9;-5.8,9.2;-17.8,8.1;-11.3,15.5;-13.6,9.9;-12.1,3.8;-7.8,14.8;0.6,29.5;3.8,15.9;-23.8,10.9;-1.1,14.9;-6.4,8.5;-6.3,19.5;-13.5,2.1;-9.3,7.2;-6,7.8;-4.3,5.4;-1.3,24.3;-4.4,11.4;-7.8,19.2;-8.5,18.2;-12.3,9.3;-13.6,1.3;-3.7,14.5;-0.2,12.1;-10.6,5.1;-7.7,17.5;-19.4,5.4;-1.6,4.2;-13.5,-0.9;-3.7,6.8;-8.9,16.5;-10.6,13.5;-8.8,6.5;-10.2,7.8;-5.5,15.5;-16.6,10.7;-10.6,-4.2;-11.7,11.9;;;;;;;;;;;;;;;;;;;;;;|123,11,150,72,74,1;123,57,83,72,57,1;124,3,225,77,67,1;124,299,190,84,50;124,22,21,120,45;124,4,189,86,46;124,14,2,84,75,1;124,32,7,96,59;124,300,206,109,59;124,0,360,94,55;124,12,71,84,70;124,6,313,78,63;124,30,297,78,72,1;124,8,9,84,68;124,26,316,95,65;124,20,401,76,80,1;124,303,23,76,42;124,264,207,95,63;124,195,171,93,47;124,10,61,94,83,1;124,160,199,89,87,1;124,106,244,63,49,1;124,39,38,103,98,1;124,25,407,90,53;124,62,442,113,76;124,357,182,117,73;124,243,411,97,51;124,181,46,64,94,1;124,13,444,94,55;124,302,456,110,56;124,110,246,84,76,1;124,261,361,95,74;124,400,464,78,46;124,97,305,82,54;124,201,412,96,47;124,158,163,99,78,1;124,238,430,95,57;124,53,389,115,83;124,393,251,86,85;124,55,107,73,76;124,56,438,97,47;124,364,147,68,56;124,204,459,74,67;124,65,258,80,58;124,325,417,100,55;124,382,84,105,54;124,66,402,103,52;124,78,112,101,58;124,365,461,86,52;124,101,102,101,65;124,85,82,116,57;124,306,428,91,39;124,44,445,86,65;124,210,209,70,78;124,315,457,111,44;124,398,72,72,62;124,95,96,121,57;124,465,466,127,42;124,320,142,91,46;124,242,111,96,95;124,386,363,71,84;124,153,420,105,44;124,226,423,105,61;124,174,275,78,87;124,166,165,93,85;124,391,94,56,55;124,387,388,73,45;124,155,405,62,69;124,117,326,82,72;124,51,379,84,56;124,137,151,74,60;124,318,294,83,70;124,88,460,80,66;124,145,140,85,72;124,63,152,96,67;124,371,329,91,57;124,36,128,80,72;124,127,216,79,53;124,109,177,102,71;124,394,146,55,59;124,40,134,71,79;124,369,323,100,77;124,143,317,89,58;124,319,121,67,55;124,126,67,77,86;124,116,90,60,71;124,75,54,70,71;124,68,74,61,49;124,91,59,92,65;124,131,5,74,58;124,133,149,95,57;124,154,321,97,52;124,156,224,83,56;124,367,120,96,60;124,89,437,111,55;124,27,424,94,51;124,234,458,87,58;124,48,406,120,61;124,92,431,123,67;124,167,81,83,58;124,34,282,75,68;124,161,162,66,42;124,176,368,72,54;124,220,196,86,79;124,193,93,106,64;124,135,35,83,64;124,113,144,97,57;124,223,175,91,39;124,345,115,85,75;124,200,105,78,83;124,203,212,78,43;124,374,168,106,88;124,170,136,78,62;124,240,130,98,71;124,60,383,82,35;124,47,425,73,65;124,269,441,90,59;124,218,436,86,60;124,197,198,89,56;124,328,100,80,58;124,298,467,80,70;124,41,452,85,41;124,79,468,68,45;124,185,469,98,50;124,108,236,67,55;124,124,123,80,75;124,29,58,70,79,1;124,183,470,82,40;124,211,132,86,60;124,324,448,84,63;124,229,304,98,59;124,233,351,100,98;124,217,17,85,72;124,289,337,115,86;124,231,392,109,65;124,283,284,133,89;124,219,1,92,67;124,221,69,77,52;124,104,76,77,86;124,77,103,71,70;124,122,125,61,75;124,215,173,83,62;124,205,194,75,58;124,356,178,76,61;124,237,42,64,68;124,86,366,123,59;124,227,311,99,58;124,186,87,90,57;124,214,453,81,51;124,43,419,124,62;124,37,333,85,55;124,291,292,88,79;124,338,339,85,55;124,270,80,61,76;124,373,239,100,60;124,260,349,66,63;124,332,254,91,60;124,188,19,85,50;124,256,31,103,79;124,262,255,94,59;124,232,410,122,50;124,241,310,69,112,1;124,268,249,102,61;124,266,267,117,64;124,248,347,94,58;124,340,471,79,62;124,213,180,87,65;124,279,277,110,47;124,342,250,134,69;124,253,263,84,74;124,271,440,97,56;124,354,247,87,69;124,341,312,75,65;124,278,99,76,62;124,295,33,90,76;124,352,15,74,65;124,276,378,100,75;124,343,399,90,74;124,346,259,89,70;124,274,381,90,85;124,191,375,75,79;124,344,335,86,49;124,265,472,78,62;124,355,281,74,73;125,24,98,90,59;125,148,52,89,60;125,16,296,106,61;125,18,169,96,74;125,301,314,85,57;125,331,358,96,43;125,141,257,78,71;125,308,140,81,55;125,309,432,92,53;125,129,64,88,54;125,172,208,75,55;125,139,157,103,59;125,138,118,76,50;125,327,454,88,60;125,384,473,106,70;125,184,427,108,45;125,372,230,100,57;125,73,222,111,50;125,179,390,97,66;125,334,196,76,54;125,330,245,66,68;125,336,397,73,66;125,235,426,95,48;125,272,450,92,66;125,353,433,111,59;125,350,50,89,77;125,293,377,63,71;125,348,288,102,78;125,376,273,102,47;126,405,446,107,50;126,68,468,91,47;126,66,389,95,58;126,306,474,85,61;126,323,70,101,74;126,57,173,63,49;126,119,92,82,73;126,367,21,99,65;126,106,434,108,43;126,49,475,101,48;126,168,187,117,70;126,220,403,90,65;126,58,413,121,52;126,322,287,79,67;126,200,159,99,55;126,238,110,94,102;126,79,380,78,71;126,368,429,112,42;126,28,228,92,59;126,252,250,132,53;126,239,476,103,52;126,247,439,105,40;126,289,99,84,70;126,285,39,95,96;126,346,207,95,72;126,274,269,105,64;127,3,226,88,57;127,299,75,113,52;127,22,395,112,70;127,2,265,104,84;127,32,103,91,61;127,300,189,98,50;127,303,29,76,58;127,195,215,74,51;127,232,158,77,67;127,81,389,114,60;127,120,477,104,67;127,113,71,97,93;127,371,171,92,69;127,190,396,118,41;127,161,151,67,60;127,241,414,70,75;127,108,418,135,66;127,304,478,120,46;127,74,479,99,52;127,369,370,107,46;127,44,45,103,90;127,209,55,77,67;127,311,72,83,94;127,400,243,60,58;127,1,393,71,64;127,386,438,120,58;127,127,27,81,64;127,315,224,72,74;127,149,146,55,66;127,7,124,66,56;127,244,95,61,71;127,314,204,68,72;127,175,365,66,60;127,155,305,88,80;127,391,317,72,49;127,114,94,67,79;127,129,25,96,67;127,150,212,83,56;127,254,206,54,66;127,130,408,86,49;127,162,132,55,58;127,131,147,102,49;127,133,59,80,61;127,375,449,76,66;127,167,455,82,48;127,345,480,76,17;127,176,481,75,45;127,233,23,85,87;127,316,51,83,63;127,374,180,82,44;127,381,422,100,55;127,104,86,83,80;127,325,42,71,72;127,185,199,94,75;127,181,307,127,61;127,217,53,95,70;127,221,194,76,53;127,356,93,83,55;127,342,476,97,53;127,177,385,107,58;127,205,240,82,80;127,260,259,67,57;127,191,192,65,52;127,290,443,93,54;127,251,280,106,66;128,8,4,77,85,1;128,148,165,97,72;128,225,118,83,57;128,26,357,89,45;128,20,60,83,57;128,18,77,101,86;128,14,377,114,63;128,301,126,89,80;128,10,47,108,67;128,138,90,71,55,1;128,78,465,85,75;128,213,296,109,53;128,354,15,98,71;128,297,328,80,83;128,294,13,70,78;128,61,134,89,65;128,382,82,106,68;128,115,435,102,50;128,89,447,112,66;128,69,70,100,57;128,359,5,81,54;128,111,112,89,67;128,320,140,91,53;128,242,398,87,75;128,11,157,95,66;128,222,482,103,79;128,363,331,74,65;128,321,258,68,57;128,172,319,95,83;128,97,64,68,51;128,135,312,77,63;128,85,231,71,69;128,36,98,109,70;128,145,216,82,73;128,394,166,67,72;128,73,219,84,90,1;128,105,463,93,50;128,121,210,66,69;128,310,116,91,68;128,154,54,76,53;128,170,174,91,77;128,48,421,89,32;128,109,137,97,71;128,34,153,73,64;128,163,302,70,63;128,201,335,79,56;128,327,462,79,62;128,186,362,103,47;128,122,236,60,67;128,372,31,92,51;128,179,110,104,67;128,211,56,78,65;128,229,17,106,54;128,188,275,76,62;128,203,202,93,32;128,237,164,84,57;128,235,347,93,62;128,334,329,91,47;128,227,37,92,60;128,253,271,78,67;128,341,266,90,63;128,332,39,118,68;128,330,287,95,78;128,178,183,100,93;128,245,483,71,49;128,283,197,85,89,1;128,268,293,96,68;128,340,218,96,90;128,352,9,81,63;128,278,269,79,70;128,285,286,102,50;128,355,273,116,44;129,12,81,107,57;129,30,336,109,68;129,38,19,90,93;129,21,416,93,56;129,55,484,111,61;129,76,309,80,70;129,83,415,113,54;129,230,451,90,65;129,91,103,76,81;129,52,33,77,74;129,238,288,85,87;129,318,101,75,78;129,255,43,83,81;129,263,349,83,70;129,92,136,80,75;129,401,117,89,88;129,169,418,102,59;129,360,151,88,80;129,262,348,66,77,1;129,248,47,90,56;129,338,9,90,67;129,350,234,88,79;129,119,120,67,57;129,139,313,84,66,1;129,212,409,89,50;129,304,307,115,44;129,173,402,81,55;129,361,53,70,68;129,58,384,98,83;129,152,68,62,82;129,62,351,75,74;129,196,306,78,77;129,57,270,83,71;129,67,171,80,73;129,214,44,68,63;129,323,128,75,83;129,223,208,75,61;129,373,50,94,65;129,142,66,67,73;129,257,485,103,65;129,80,25,88,76;129,100,184,67,74,1;129,144,40,49,88;129,143,199,76,81;129,193,156,67,58,1;129,279,282,64,60;129,141,422,68,58;129,65,63,86,74;129,333,404,94,39;129,46,180,93,71;129,298,368,78,76;129,326,228,79,83;129,41,376,52,63;129,256,29,99,81;129,342,273,143,49;129,251,273,116,43;129,249,324,93,101;129,276,291,81,65;129,346,343,83,77;129,281,353,79,60;129,272,261,91,79"};
+const BACKTEST = {"window": "Walk-forward, weekly refits, test games from 2024-07-01 through 2026-11-07 (2024-25 and 2025-26 full seasons + 2026-27 to date). Training history from 2022. Preseason, exhibition and all-star games removed for NFL/NBA/NHL.", "nfl": {"n": 692, "acc": 0.6362, "brier": 0.2213, "logloss": 0.6329, "coinBrier": 0.2487, "homeRate": 0.536, "mae": 10.24, "maeTotal": 10.71, "sigma": 13.25, "sigmaT": 13.6, "orig": {"acc": 0.6362, "brier": 0.2224, "logloss": 0.6351}, "bins": [[287, 54.9, 52.3], [214, 64.7, 68.2], [134, 74.0, 73.9], [55, 83.8, 80.0], [0, null, null]], "P": {"carry": 0.9, "prior": 4, "halfLife": 120, "cap": 21, "newTeam": 0, "hcaPrior": 2, "sigma": 13.25, "sigmaT": 13.6, "b2b": 0}}, "cfb": {"n": 2475, "acc": 0.7422, "brier": 0.1636, "logloss": 0.4884, "coinBrier": 0.2277, "homeRate": 0.649, "mae": 12.92, "maeTotal": 13.43, "sigma": 17.25, "sigmaT": 16.82, "orig": {"acc": 0.7281, "brier": 0.1755, "logloss": 0.5211}, "bins": [[507, 54.9, 51.1], [513, 64.8, 63.5], [455, 75.1, 75.2], [443, 85.1, 84.7], [557, 95.8, 96.1]], "P": {"carry": 1, "prior": 2, "halfLife": 0, "cap": 0, "newTeam": -30, "hcaPrior": 3, "sigma": 17.25, "sigmaT": 16.82, "b2b": 0}}, "nba": {"n": 2781, "acc": 0.6695, "brier": 0.2082, "logloss": 0.603, "coinBrier": 0.2476, "homeRate": 0.549, "mae": 11.31, "maeTotal": 14.98, "sigma": 11.5, "sigmaT": 18.84, "orig": {"acc": 0.6688, "brier": 0.2094, "logloss": 0.6062}, "bins": [[916, 55.0, 54.4], [809, 64.8, 64.5], [628, 74.7, 75.8], [352, 84.2, 83.8], [76, 92.5, 93.4]], "P": {"carry": 0.75, "prior": 4, "halfLife": 40, "cap": 25, "newTeam": 0, "hcaPrior": 2.5, "sigma": 11.5, "sigmaT": 18.84, "b2b": 2}}, "nhl": {"n": 3054, "acc": 0.5625, "brier": 0.241, "logloss": 0.6747, "coinBrier": 0.248, "homeRate": 0.544, "mae": 2.15, "maeTotal": 1.85, "sigma": 2.4, "sigmaT": 2.31, "orig": {"acc": 0.557, "brier": 0.2438, "logloss": 0.6805}, "bins": [[2176, 54.5, 52.1], [763, 63.9, 64.9], [113, 73.1, 77.9], [2, 84.2, 100.0], [0, null, null]], "P": {"carry": 0.6, "prior": 50, "halfLife": 0, "cap": 0, "newTeam": 0, "hcaPrior": 0.2, "sigma": 2.4, "sigmaT": 2.31, "b2b": 0.45}}, "cbb": {"n": 12770, "acc": 0.7449, "brier": 0.1656, "logloss": 0.4904, "coinBrier": 0.2208, "homeRate": 0.671, "mae": 9.9, "maeTotal": 13.92, "sigma": 11.75, "sigmaT": 17.64, "orig": {"acc": 0.7245, "brier": 0.1826, "logloss": 0.5419}, "bins": [[2734, 54.9, 55.9], [2683, 65.0, 62.7], [2442, 74.7, 72.3], [2004, 84.8, 85.5], [2907, 96.5, 97.0]], "P": {"carry": 1, "prior": 1, "halfLife": 0, "cap": 35, "newTeam": -8, "hcaPrior": 3, "sigma": 11.75, "sigmaT": 17.64, "b2b": 0}}};
+</script>
+<script>
+(() => {
+const E = OE, $ = id => document.getElementById(id), DAY = 864e5;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const f1 = x => (x == null || !isFinite(x)) ? '–' : (+x).toFixed(1);
+const f2 = x => (x == null || !isFinite(x)) ? '–' : (+x).toFixed(2);
+const pct = (x, d = 1) => (x == null || !isFinite(x)) ? '–' : (x * 100).toFixed(d) + '%';
+const sgn = (x, d = 1) => (x > 0 ? '+' : '') + (+x).toFixed(d);
+const am = x => !isFinite(x) ? '–' : (x > 0 ? '+' : '') + Math.round(x);
+const val = id => { const v = parseFloat($(id).value); return isFinite(v) ? v : null; };
+const ORDER = ['nfl', 'cfb', 'nba', 'nhl', 'cbb'];
+const COLORS = { nfl: '#60a5fa', cfb: '#f59e0b', nba: '#f97316', nhl: '#22d3ee', cbb: '#a78bfa' };
+const EPOCH = Date.UTC(2026, 6, 1);
+const NOW = () => Date.now();
+
+// ---------- data ----------
+const S = {}; // per sport: {D, user:[], R, active:Set}
+function parseBundle(str) {
+  const [sp, mu, hca, names, pri, gs] = str.split('|');
+  const N = names.split('^').map(x => x.replace(/\+/g, '&'));
+  const priors = {};
+  pri.split(';').forEach((p, i) => { if (!p) return; const [o, d] = p.split(',').map(Number); priors[E.norm(N[i])] = { name: N[i], o, d }; });
+  const games = gs ? gs.split(';').map(r => { const a = r.split(',').map(Number); return { t: EPOCH + a[0] * DAY, h: N[a[1]], a: N[a[2]], hs: a[3], as: a[4], n: a[5] ? 1 : 0 }; }) : [];
+  return { mu: +mu, hca: +hca, names: N, priors, games, thru: games.length ? Math.max(...games.map(g => g.t)) : EPOCH };
+}
+ORDER.forEach(s => { S[s] = { D: parseBundle(DATA[s]), user: [], R: null }; });
+let sport = 'nfl';
+const P = () => E.SPORTS[sport].p;
+function allGames(s) { return S[s].D.games.concat(S[s].user).sort((a, b) => a.t - b.t); }
+function ratings(s = sport) {
+  const st = S[s]; if (st.R) return st.R;
+  const G = allGames(s), D = st.D;
+  const R = E.fitSeason(G, D.priors, E.SPORTS[s].p, Math.max(NOW(), D.thru + DAY));
+  if (!G.length) { R.mu = D.mu; R.hca = D.hca; }
+  st.active = new Set(); G.forEach(g => { st.active.add(E.norm(g.h)); st.active.add(E.norm(g.a)); });
+  st.R = R; return R;
+}
+const invalidate = s => { S[s].R = null; };
+function teamList(s = sport) { const R = ratings(s); return Object.values(R.teams).filter(t => S[s].active.has(E.norm(t.name)) || s === 'nfl' || s === 'nba' || s === 'nhl'); }
+function findTeam(input, s = sport) {
+  const q = E.norm(input); if (!q) return null;
+  const R = ratings(s); if (R.teams[q]) return R.teams[q];
+  const list = teamList(s);
+  let c = list.filter(t => (' ' + E.norm(t.name) + ' ').includes(' ' + q + ' '));
+  if (c.length === 1) return c[0];
+  if (c.length > 1) { // prefer names that start with the query and add the fewest extra words (e.g. "Michigan" -> Michigan Wolverines)
+    const st = c.filter(t => E.norm(t.name).startsWith(q + ' ')).map(t => ({ t, w: E.norm(t.name).split(' ').length, l: t.name.length })).sort((a, b) => a.w - b.w || a.l - b.l);
+    if (st.length === 1 || (st.length > 1 && st[0].w < st[1].w)) return st[0].t;
+    if (st.length > 1) return st[0].t;
+  }
+  if (!c.length) { c = list.filter(t => E.norm(t.name).includes(q)); if (c.length === 1) return c[0]; }
+  return null;
+}
+const net = t => t.o - t.d;
+
+// ---------- persistence ----------
+const store = { mode: 'none', db: null, uid: null, chains: {}, timers: {} };
+let LOG = [];
+const LS = 'sportsOracle:';
+function setStatus() { const el = $('saveStatus'); el.innerHTML = store.mode === 'db' ? '<b>●</b> Saved to your account' : store.mode === 'local' ? 'Saved in this browser only' : 'Not saved (this visit only)'; }
+function body(key) { if (key === 'log') return { entries: LOG }; const s = key.slice(6); return { list: S[s].user.map(g => [g.t, g.h, g.a, g.hs, g.as, g.n]) }; }
+function save(key) {
+  clearTimeout(store.timers[key]);
+  store.timers[key] = setTimeout(() => {
+    const b = JSON.parse(JSON.stringify(body(key)));
+    if (store.mode === 'db') {
+      const ref = store.db.collection('data/users/' + store.uid).doc(key);
+      store.chains[key] = (store.chains[key] || Promise.resolve()).then(() => ref.set(b)).catch(err => { console.warn(err); if (err && err.code === 'quota_exceeded') { $('saveStatus').textContent = 'Account storage full'; return; } store.mode = 'local'; setStatus(); saveLocal(key, b); });
+    } else saveLocal(key, b);
+  }, 400);
+}
+function saveLocal(key, b) { try { localStorage.setItem(LS + key, JSON.stringify(b)); if (store.mode === 'none') { store.mode = 'local'; setStatus(); } } catch (e) {} }
+function applyLoaded(key, d) {
+  if (!d) return;
+  if (key === 'log') { if (Array.isArray(d.entries)) LOG = d.entries; return; }
+  const s = key.slice(6); if (!S[s] || !Array.isArray(d.list)) return;
+  S[s].user = d.list.map(a => ({ t: a[0], h: a[1], a: a[2], hs: a[3], as: a[4], n: a[5] ? 1 : 0 })); invalidate(s);
+}
+const KEYS = ['log'].concat(ORDER.map(s => 'games-' + s));
+async function initStore() {
+  let done = false;
+  const fallback = () => { if (done) return; done = true; try { KEYS.forEach(k => applyLoaded(k, JSON.parse(localStorage.getItem(LS + k) || 'null'))); store.mode = 'local'; } catch (e) { store.mode = 'none'; } after(); };
+  const timer = setTimeout(fallback, 10000);
+  try {
+    if (!window.claude || !window.claude.use) { clearTimeout(timer); return fallback(); }
+    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    const uid = user ? await user.id() : null;
+    if (!db || !uid) { clearTimeout(timer); return fallback(); }
+    const col = db.collection('data/users/' + uid);
+    const snaps = await Promise.all(KEYS.map(k => col.doc(k).get()));
+    clearTimeout(timer); if (done) return; done = true;
+    store.db = db; store.uid = uid; store.mode = 'db';
+    snaps.forEach((sn, i) => { if (sn.exists) applyLoaded(KEYS[i], sn.data()); });
+    after();
+  } catch (e) { clearTimeout(timer); console.warn(e); fallback(); }
+}
+function after() { setStatus(); renderAll(); }
+
+// ---------- routing & sport switch ----------
+const VIEWS = ['predict', 'slate', 'ratings', 'results', 'backtest', 'log', 'guide'];
+function route() {
+  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'predict';
+  VIEWS.forEach(x => $('v-' + x).classList.toggle('on', x === v));
+  document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.v === v));
+  if (v === 'ratings') renderRatings(); if (v === 'log') renderLog(); if (v === 'results') renderUserGames(); if (v === 'backtest') renderBacktest();
+}
+window.addEventListener('hashchange', route);
+$('sports').innerHTML = ORDER.map(s => `<button data-s="${s}"><span class="dot" style="background:${COLORS[s]}"></span>${esc(E.SPORTS[s].name)}</button>`).join('');
+$('sports').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setSport(b.dataset.s); });
+const lastSport = (() => { try { return localStorage.getItem(LS + 'sport'); } catch (e) { return null; } })();
+function setSport(s) {
+  sport = s; try { localStorage.setItem(LS + 'sport', s); } catch (e) {}
+  document.querySelectorAll('#sports button').forEach(b => b.classList.toggle('on', b.dataset.s === s));
+  document.documentElement.style.setProperty('--accent', COLORS[s]);
+  ['A', 'H'].forEach(k => { $('name' + k).value = ''; $('adj' + k).value = 0; $('b2b' + k).checked = false; });
+  ['spread', 'total', 'mlA', 'mlH'].forEach(i => $(i).value = ''); $('favSide').value = ''; $('spreadOdds').value = s === 'nhl' ? '' : -110; $('spreadOdds').placeholder = s === 'nhl' ? 'e.g. -210 (required)' : '';
+  renderAll();
+}
+
+// ---------- predict ----------
+function sideHTML(k, label) {
+  return `<div class="teamhead"><b>${label}</b><span class="badge" id="badge${k}">–</span></div>
+  <input id="name${k}" list="teamList" placeholder="Team" autocomplete="off">
+  <label>Adjustment (<span class="unitLbl">pts</span>)</label><input id="adj${k}" type="number" step="0.5" value="0" title="Injuries/news: negative if a key player is out">
+  <label class="chk b2bRow"><input type="checkbox" id="b2b${k}"> Played yesterday (back-to-back)</label>`;
+}
+$('sideA').innerHTML = sideHTML('A', 'Away team'); $('sideH').innerHTML = sideHTML('H', 'Home team');
+['A', 'H'].forEach(k => { $('name' + k).addEventListener('input', renderResult); $('adj' + k).addEventListener('input', renderResult); $('b2b' + k).addEventListener('change', renderResult); });
+let venue = 'H';
+$('venue').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; venue = b.dataset.v; [...$('venue').children].forEach(x => x.classList.toggle('on', x === b)); renderResult(); });
+['favSide', 'spread', 'spreadOdds', 'total', 'totalOdds', 'mlA', 'mlH'].forEach(id => $(id).addEventListener('input', renderResult));
+function rankMap() { const L = teamList().sort((a, b) => net(b) - net(a)); return new Map(L.map((t, i) => [t, i + 1])); }
+
+function predictGame(home, away, neutral, adj = {}) {
+  const R = ratings(), p = P();
+  const e = E.expected(R, home.name, away.name, neutral, { h: (adj.h || 0) - (adj.bh ? p.b2b : 0), a: (adj.a || 0) - (adj.ba ? p.b2b : 0) });
+  const g = E.gameProbs(sport, e, p);
+  return { ph: e.ph, pa: e.pa, ...g };
+}
+function analyze(G, lines) {
+  const out = [], kf = 0.25;
+  if (lines.spreadH != null && lines.spreadOdds != null) {
+    const odds = lines.spreadOdds, be = E.amToProb(odds), dec = E.amToDec(odds);
+    const pH = G.cover(lines.spreadH), pA = 1 - pH, side = pH >= pA ? 'H' : 'A', p = Math.max(pH, pA);
+    out.push({ kind: sport === 'nhl' ? 'Puck line' : 'Spread', side, p, push: 0, edge: p - be, ev: p * (dec - 1) - (1 - p), kelly: E.kelly(p, odds) * kf, line: side === 'H' ? lines.spreadH : -lines.spreadH });
+  }
+  if (lines.total != null) {
+    const odds = lines.totalOdds ?? -110, be = E.amToProb(odds), dec = E.amToDec(odds);
+    const pO = G.over(lines.total), side = pO >= 0.5 ? 'Over' : 'Under', p = Math.max(pO, 1 - pO);
+    out.push({ kind: 'Total', side, p, push: 0, edge: p - be, ev: p * (dec - 1) - (1 - p), kelly: E.kelly(p, odds) * kf, line: lines.total });
+  }
+  for (const [k, ml, p] of [['A', lines.mlA, 1 - G.pHome], ['H', lines.mlH, G.pHome]]) {
+    if (ml == null || !isFinite(E.amToDec(ml))) continue;
+    out.push({ kind: 'Moneyline', side: k, p, push: 0, edge: p - E.amToProb(ml), ev: p * (E.amToDec(ml) - 1) - (1 - p), kelly: E.kelly(p, ml) * kf, line: ml });
+  }
+  return out;
+}
+const tier = e => e >= 0.04 ? 'strong' : e > 0.015 ? 'val' : '';
+const tierLabel = e => e >= 0.04 ? '<span class="tag g">STRONG VALUE</span>' : e > 0.015 ? '<span class="tag g">VALUE</span>' : e > 0 ? '<span class="tag y">THIN</span>' : '<span class="tag m">NO EDGE</span>';
+function currentLines() {
+  const fav = $('favSide').value, sp = val('spread');
+  let spreadH = null; if (fav && sp != null) spreadH = fav === 'H' ? -Math.abs(sp) : Math.abs(sp);
+  return { spreadH, spreadOdds: val('spreadOdds') ?? (sport === 'nhl' ? null : -110), total: val('total'), totalOdds: val('totalOdds') ?? -110, mlA: val('mlA'), mlH: val('mlH') };
+}
+let lastPred = null;
+function renderResult() {
+  const A = findTeam($('nameA').value), H = findTeam($('nameH').value), rk = rankMap(), el = $('result');
+  for (const [k, t] of [['A', A], ['H', H]]) { const b = $('badge' + k), v = $('name' + k).value.trim();
+    if (t) { b.textContent = `#${rk.get(t) || '–'} · ${t.name}`; b.className = 'badge ok'; } else { b.textContent = v ? 'No match yet' : '–'; b.className = 'badge' + (v ? ' no' : ''); } }
+  if (!A || !H || A === H) { lastPred = null; el.innerHTML = `<h2>Prediction</h2><div class="empty">Pick an away team and a home team to see the projection.<br><span class="small">Start typing a team name, e.g. ${esc(ex()[0])}.</span></div>`; return; }
+  const neutral = venue === 'N', adj = { a: val('adjA') || 0, h: val('adjH') || 0, ba: $('b2bA').checked, bh: $('b2bH').checked };
+  const G = predictGame(H, A, neutral, adj), lines = currentLines();
+  lastPred = { A, H, neutral, G, lines };
+  const hockey = sport === 'nhl', dp = hockey ? 1 : 0, m = G.margin;
+  const favT = m >= 0 ? H : A, favP = Math.max(G.pHome, 1 - G.pHome);
+  const picks = analyze(G, lines);
+  const nm = k => esc(k === 'A' ? A.name : H.name);
+  const short = n => n.length > 18 ? n.split(' ').slice(-1)[0] : n;
+  const row = x => {
+    const what = x.kind === 'Total' ? `${x.side} ${f1(x.line)}` : x.kind === 'Moneyline' ? `${nm(x.side)} ${am(x.line)}` : `${nm(x.side)} ${sgn(x.line)}`;
+    const det = x.kind === 'Moneyline' ? `Model ${pct(x.p)} vs market ${pct(E.amToProb(x.line))}` : `Model ${pct(x.p)} to win this bet${x.push > 0.005 ? ` · push ${pct(x.push)}` : ''}`;
+    return `<div class="pick ${tier(x.edge)}"><div><div class="t">${x.kind}: ${what} ${tierLabel(x.edge)}</div><div class="d">${det}</div></div><div class="e"><div class="${x.edge > 0 ? 'good' : 'muted'}">${sgn(x.edge * 100)}%</div><div class="small muted">EV ${sgn(x.ev * 100)}¢/$ · stake ${pct(x.kelly)}</div></div></div>`;
+  };
+  el.innerHTML = `<h2>Prediction <span class="sub">${esc(E.SPORTS[sport].name)}</span></h2>
+    <div class="score"><div><div class="nm">${esc(A.name)}</div><div class="pts mono" style="color:${m < 0 ? 'var(--accent)' : 'var(--text)'}">${G.pa.toFixed(dp)}</div></div>
+      <div class="vs">${neutral ? 'neutral' : '@'}</div>
+      <div><div class="nm">${esc(H.name)}</div><div class="pts mono" style="color:${m >= 0 ? 'var(--accent)' : 'var(--text)'}">${G.ph.toFixed(dp)}</div></div></div>
+    <div class="row small" style="justify-content:space-between"><span>${esc(short(A.name))} <b class="mono">${pct(1 - G.pHome)}</b></span><span style="text-align:right"><b class="mono">${pct(G.pHome)}</b> ${esc(short(H.name))}</span></div>
+    <div class="probbar"><div style="width:${(1 - G.pHome) * 100}%;background:var(--blue)"></div><div style="width:${G.pHome * 100}%;background:var(--accent)"></div></div>
+    <div class="kpis">
+      <div class="kpi"><div class="k">${hockey ? 'Goal margin' : 'Model spread'}</div><div class="v">${sgn(-Math.abs(m))}</div><div class="s">${esc(short(favT.name))} · ${f1(G.pa)}–${f1(G.ph)}</div></div>
+      <div class="kpi"><div class="k">Projected total</div><div class="v">${f1(G.total)}</div><div class="s">${hockey ? `OT/shootout chance ${pct(G.pTie, 0)}` : 'points'}</div></div>
+      <div class="kpi"><div class="k">Fair moneyline</div><div class="v">${am(E.probToAm(G.pHome))}</div><div class="s">${esc(short(H.name))} · away ${am(E.probToAm(1 - G.pHome))}</div></div>
+      <div class="kpi"><div class="k">Confidence</div><div class="v">${favP >= .8 ? 'High' : favP >= .64 ? 'Medium' : 'Toss-up'}</div><div class="s">${esc(short(favT.name))} ${pct(favP, 0)}</div></div>
+    </div>
+    <h3 style="margin-top:16px">Bets vs the market</h3>
+    ${picks.length ? picks.map(row).join('') : '<div class="note" style="margin-top:0">Enter a spread, total or moneyline to see where the model disagrees with the book.</div>'}
+    <div class="btns"><button class="btn" id="saveLog">Save to track record</button><button class="btn ghost" id="swap">Swap home/away</button></div>
+    <div class="msg" id="predMsg"></div>`;
+  $('saveLog').onclick = saveToLog; $('swap').onclick = () => { const a = $('nameA').value; $('nameA').value = $('nameH').value; $('nameH').value = a; const b = $('adjA').value; $('adjA').value = $('adjH').value; $('adjH').value = b; const c = $('b2bA').checked; $('b2bA').checked = $('b2bH').checked; $('b2bH').checked = c; const f = $('favSide').value; if (f) $('favSide').value = f === 'A' ? 'H' : 'A'; const ml = $('mlA').value; $('mlA').value = $('mlH').value; $('mlH').value = ml; renderResult(); };
+}
+function saveToLog() {
+  if (!lastPred) return; const { A, H, neutral, G, lines } = lastPred;
+  const picks = analyze(G, lines), sp = picks.find(x => x.kind !== 'Total' && x.kind !== 'Moneyline'), tt = picks.find(x => x.kind === 'Total');
+  LOG.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), ts: Date.now(), sp: sport, a: A.name, h: H.name, n: neutral ? 1 : 0,
+    pa: +G.pa.toFixed(2), ph: +G.ph.toFixed(2), pH: +G.pHome.toFixed(4), spreadH: lines.spreadH, total: lines.total,
+    spPick: sp ? sp.side : null, totPick: tt ? tt.side : null, fa: null, fh: null });
+  if (LOG.length > 2000) LOG.length = 2000; save('log');
+  $('predMsg').innerHTML = '<span class="good">Saved.</span> Enter the final score later in <a href="#log">Track record</a>.';
+}
+
+// ---------- slate ----------
+function parseSlateLine(line) {
+  const parts = line.split(',').map(s => s.trim()); let A, H, n, mm;
+  if ((mm = parts[0].match(/^(.*?)\s+(?:@|at)\s+(.*)$/i))) { A = mm[1]; H = mm[2]; n = false; }
+  else if ((mm = parts[0].match(/^(.*?)\s+(?:vs\.?|v\.?)\s+(.*)$/i))) { A = mm[1]; H = mm[2]; n = true; }
+  else return null;
+  const num = x => { if (x === undefined || x === '') return null; const v = parseFloat(String(x).replace(/pk|pick/i, '0')); return isFinite(v) ? v : null; };
+  return { A: A.replace(/^#?\d+\s+/, '').trim(), H: H.replace(/\s*\((n|neutral)\)\s*$/i, '').replace(/^#?\d+\s+/, '').trim(), n, spreadH: num(parts[1]), total: num(parts[2]) };
+}
+let slateRows = [];
+$('slateGo').onclick = () => {
+  const lines = $('slateIn').value.split('\n').map(x => x.trim()).filter(Boolean); slateRows = []; const miss = [];
+  for (const ln of lines) {
+    const g = parseSlateLine(ln); if (!g) { miss.push(`Couldn't read: "${ln}"`); continue; }
+    const a = findTeam(g.A), h = findTeam(g.H);
+    if (!a || !h) { miss.push(`No unique match for: ${[!a && g.A, !h && g.H].filter(Boolean).join(', ')}`); continue; }
+    const G = predictGame(h, a, g.n), picks = analyze(G, { spreadH: g.spreadH, spreadOdds: sport === 'nhl' ? null : -110, total: g.total, totalOdds: -110 });
+    slateRows.push({ g, a, h, G, picks, best: picks.reduce((m, x) => (!m || x.edge > m.edge) ? x : m, null) });
+  }
+  slateRows.sort((x, y) => (y.best ? y.best.edge : -1) - (x.best ? x.best.edge : -1));
+  $('slateMsg').innerHTML = `${slateRows.length} game${slateRows.length === 1 ? '' : 's'} predicted.` + (miss.length ? `<div class="warn small" style="margin-top:6px">${miss.map(esc).join('<br>')}</div>` : '');
+  renderSlate();
+};
+function renderSlate() {
+  if (!slateRows.length) { $('slateOut').innerHTML = '<div class="empty">No games predicted.</div>'; return; }
+  const dp = sport === 'nhl' ? 1 : 0;
+  $('slateOut').innerHTML = `<table><thead><tr><th>Matchup</th><th class="n">Projected</th><th class="n">Win % (away/home)</th><th class="n">Model line</th><th class="n">Book line</th><th>Side pick</th><th class="n">Proj total</th><th class="n">Book total</th><th>Total pick</th><th>Best edge</th></tr></thead><tbody>${
+    slateRows.map((r, i) => { const sp = r.picks.find(x => x.kind !== 'Total' && x.kind !== 'Moneyline'), tt = r.picks.find(x => x.kind === 'Total');
+      return `<tr class="click" data-i="${i}"><td><b>${esc(r.a.name)}</b> ${r.g.n ? 'vs' : '@'} <b>${esc(r.h.name)}</b></td><td class="n">${r.G.pa.toFixed(dp)}–${r.G.ph.toFixed(dp)}</td><td class="n">${pct(1 - r.G.pHome, 0)} / ${pct(r.G.pHome, 0)}</td><td class="n">${sgn(-r.G.margin)}</td><td class="n">${r.g.spreadH == null ? '–' : sgn(r.g.spreadH)}</td>
+        <td>${sp ? `${esc(sp.side === 'H' ? r.h.name : r.a.name)} ${sgn(sp.line)} <span class="${sp.edge > 0 ? 'good' : 'muted'} mono small">${pct(sp.p, 0)}</span>` : '–'}</td><td class="n">${f1(r.G.total)}</td><td class="n">${r.g.total == null ? '–' : f1(r.g.total)}</td>
+        <td>${tt ? `${tt.side} <span class="${tt.edge > 0 ? 'good' : 'muted'} mono small">${pct(tt.p, 0)}</span>` : '–'}</td><td>${r.best ? tierLabel(r.best.edge) + ` <span class="mono small">${sgn(r.best.edge * 100)}%</span>` : '–'}</td></tr>`; }).join('')}</tbody></table>
+    <div class="note">Lines are the home team's (e.g. −3.5 = home favored by 3.5). Edges assume −110 odds${sport === 'nhl' ? '; puck lines are skipped here because their prices vary — check them in Predict with the real odds' : ''}.</div>`;
+  $('slateOut').querySelectorAll('tr.click').forEach(tr => tr.onclick = () => { const r = slateRows[+tr.dataset.i];
+    $('nameA').value = r.a.name; $('nameH').value = r.h.name; $('venue').querySelector(`[data-v="${r.g.n ? 'N' : 'H'}"]`).click();
+    if (r.g.spreadH != null) { $('favSide').value = r.g.spreadH <= 0 ? 'H' : 'A'; $('spread').value = Math.abs(r.g.spreadH); } else { $('favSide').value = ''; $('spread').value = ''; }
+    $('total').value = r.g.total ?? ''; location.hash = 'predict'; renderResult(); });
+}
+function ex() { const t = teamList().sort((a, b) => net(b) - net(a)); return [t[0] ? t[0].name.split(' ').slice(-1)[0] : '']; }
+$('slateDemo').onclick = () => {
+  const T = teamList().filter(t => t.gp > 0).sort(() => Math.random() - .5).slice(0, 10), out = [];
+  for (let i = 0; i + 1 < T.length; i += 2) { const G = predictGame(T[i + 1], T[i], false); const book = Math.round((-G.margin + (Math.random() - .5) * (sport === 'nhl' ? 0 : 5)) * 2) / 2;
+    out.push(`${T[i].name} @ ${T[i + 1].name}, ${sport === 'nhl' ? (G.margin >= 0 ? '-1.5' : '+1.5') : sgn(book)}, ${sport === 'nhl' ? '6.5' : (Math.round((G.total + (Math.random() - .5) * 8) * 2) / 2).toFixed(1)}`); }
+  $('slateIn').value = out.join('\n'); $('slateMsg').textContent = 'Example lines are made up. Paste real ones from your sportsbook.';
+};
+
+// ---------- ratings ----------
+let ratSort = { k: 'net', dir: -1 };
+function renderRatings() {
+  const R = ratings(), unit = E.SPORTS[sport].unit, q = E.norm($('ratSearch').value), activeOnly = $('ratActive').checked;
+  let L = teamList(); const rk = new Map([...L].sort((a, b) => net(b) - net(a)).map((t, i) => [t, i + 1]));
+  if (activeOnly) L = L.filter(t => t.gp > 0);
+  if (q) L = L.filter(t => E.norm(t.name).includes(q));
+  const k = ratSort.k, dir = ratSort.dir, v = t => k === 'net' ? net(t) : k === 'name' ? t.name.toLowerCase() : k === 'd' ? -t.d : t[k];
+  L.sort((a, b) => (v(a) > v(b) ? 1 : v(a) < v(b) ? -1 : 0) * dir);
+  const dp = unit === 'goals' ? 2 : 1;
+  $('ratSub').textContent = `· ${E.SPORTS[sport].name} · ${L.length} teams · league avg ${f1(R.mu)} ${unit}/team · home edge ${f2(R.hca)}`;
+  const th = (key, lbl, n) => `<th class="sort${n ? ' n' : ''}" data-k="${key}">${lbl}${ratSort.k === key ? (ratSort.dir < 0 ? ' ▼' : ' ▲') : ''}</th>`;
+  $('ratTable').innerHTML = `<table><thead><tr><th class="n">Rk</th>${th('name', 'Team')}${th('gp', 'Games', 1)}${th('o', 'Offense', 1)}${th('d', 'Defense', 1)}${th('net', 'Net', 1)}<th class="n">Win % vs avg (neutral)</th></tr></thead><tbody>${
+    L.map(t => { const G = E.gameProbs(sport, { ph: R.mu + t.o, pa: R.mu + t.d }, P()); return `<tr class="click" data-n="${esc(t.name)}"><td class="n muted">${rk.get(t)}</td><td><b>${esc(t.name)}</b></td><td class="n">${t.gp}</td><td class="n">${sgn(t.o, dp)}</td><td class="n">${sgn(t.d, dp)}</td><td class="n ${net(t) >= 0 ? 'good' : 'bad'}">${sgn(net(t), dp)}</td><td class="n">${pct(G.pHome, 0)}</td></tr>`; }).join('')}</tbody></table>`;
+  $('ratNote').innerHTML = `Offense = ${unit} scored above an average team; defense = ${unit} allowed above average (negative is good). Net = expected margin vs an average team on a neutral field. Click a team to load it into Predict.`;
+  $('ratTable').querySelectorAll('th.sort').forEach(h => h.onclick = () => { const kk = h.dataset.k; ratSort = { k: kk, dir: ratSort.k === kk ? -ratSort.dir : (kk === 'name' ? 1 : -1) }; renderRatings(); });
+  $('ratTable').querySelectorAll('tr.click').forEach(tr => tr.onclick = () => { const n = tr.dataset.n; if (!$('nameA').value) $('nameA').value = n; else $('nameH').value = n; location.hash = 'predict'; renderResult(); });
+}
+$('ratSearch').addEventListener('input', renderRatings); $('ratActive').addEventListener('change', renderRatings);
+
+// ---------- results ----------
+function parseDate(s) { s = String(s).trim(); let m;
+  if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return Date.UTC(+m[1], +m[2] - 1, +m[3]);
+  if ((m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/))) { let y = +m[3]; if (y < 100) y += 2000; return Date.UTC(y, +m[1] - 1, +m[2]); }
+  return NaN; }
+function addGames(list) {
+  const st = S[sport], keys = new Set(allGames(sport).map(g => g.t + '|' + E.norm(g.h) + '|' + E.norm(g.a)));
+  let added = 0, dup = 0, old = 0;
+  for (const g of list) { if (E.seasonOf(g.t) !== E.seasonOf(EPOCH)) { old++; continue; } const k = g.t + '|' + E.norm(g.h) + '|' + E.norm(g.a); if (keys.has(k)) { dup++; continue; } keys.add(k); st.user.push(g); added++; }
+  if (added) { invalidate(sport); save('games-' + sport); renderAll(); }
+  return { added, dup, old };
+}
+$('resAdd').onclick = () => {
+  const rows = $('resIn').value.trim().split('\n').map(l => l.split(/[,\t]/).map(x => x.trim())).filter(r => r.length >= 5);
+  const list = [], bad = [];
+  for (const r of rows) { const t = parseDate(r[0]); if (isNaN(t)) continue; // header or bad row
+    const h = findTeam(r[1]), a = findTeam(r[2]), hs = parseFloat(r[3]), as = parseFloat(r[4]);
+    if (!h || !a || !isFinite(hs) || !isFinite(as)) { bad.push(r.slice(0, 3).join(', ')); continue; }
+    list.push({ t, h: h.name, a: a.name, hs, as, n: ['1', 'true', 'yes', 'y', 'n', 'neutral'].includes(String(r[5] || '').toLowerCase()) ? 1 : 0 }); }
+  const res = addGames(list);
+  $('resMsg').innerHTML = `<span class="${res.added ? 'good' : 'muted'}">Added ${res.added} game${res.added === 1 ? '' : 's'}.</span>` + (res.dup ? ` ${res.dup} already in the data.` : '') + (res.old ? ` ${res.old} skipped (not this season).` : '') + (bad.length ? `<div class="warn small" style="margin-top:6px">Teams not recognized in: ${bad.slice(0, 5).map(esc).join(' · ')}${bad.length > 5 ? ' …' : ''}</div>` : '');
+  if (res.added) $('resIn').value = '';
+};
+$('qAdd').onclick = () => {
+  const t = parseDate($('qDate').value), h = findTeam($('qHome').value), a = findTeam($('qAway').value), hs = val('qHs'), as = val('qAs');
+  if (isNaN(t) || !h || !a || hs == null || as == null) { $('qMsg').innerHTML = '<span class="warn">Fill in the date, both teams (pick from the list) and both scores.</span>'; return; }
+  const r = addGames([{ t, h: h.name, a: a.name, hs, as, n: $('qNeu').checked ? 1 : 0 }]);
+  $('qMsg').innerHTML = r.added ? `<span class="good">Added ${esc(a.name)} ${as} @ ${esc(h.name)} ${hs}.</span>` : '<span class="muted">That game is already in the data.</span>';
+  if (r.added) ['qAway', 'qHome', 'qAs', 'qHs'].forEach(i => $(i).value = '');
+};
+function renderUserGames() {
+  const st = S[sport]; $('dataThru').textContent = new Date(st.D.thru).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  $('userCount').textContent = `· ${E.SPORTS[sport].name} · ${st.user.length}`;
+  if (!st.user.length) { $('userGames').innerHTML = '<div class="empty">None yet for this sport.</div>'; return; }
+  const L = st.user.map((g, i) => ({ g, i })).sort((x, y) => y.g.t - x.g.t);
+  $('userGames').innerHTML = `<table><thead><tr><th>Date</th><th>Away</th><th class="n">Score</th><th>Home</th><th class="n">Score</th><th></th><th></th></tr></thead><tbody>${L.map(({ g, i }) => `<tr><td>${new Date(g.t).toISOString().slice(0, 10)}</td><td>${esc(g.a)}</td><td class="n">${g.as}</td><td>${esc(g.h)}</td><td class="n">${g.hs}</td><td class="muted small">${g.n ? 'neutral' : ''}</td><td><button class="btn ghost sm" data-del="${i}">✕</button></td></tr>`).join('')}</tbody></table>`;
+  $('userGames').querySelectorAll('[data-del]').forEach(b => b.onclick = () => { st.user.splice(+b.dataset.del, 1); invalidate(sport); save('games-' + sport); renderAll(); });
+}
+
+// ---------- backtest ----------
+function renderBacktest() {
+  const rows = ORDER.map(s => { const b = BACKTEST[s]; const imp = (b.orig.brier - b.brier) / b.orig.brier;
+    return `<tr${s === sport ? ' style="background:var(--panel2)"' : ''}><td><span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${COLORS[s]};margin-right:6px"></span><b>${esc(E.SPORTS[s].name)}</b></td><td class="n">${b.n.toLocaleString()}</td><td class="n"><b>${pct(b.acc)}</b></td><td class="n">${pct(b.homeRate)}</td><td class="n"><b>${b.brier.toFixed(4)}</b></td><td class="n muted">${b.coinBrier.toFixed(4)}</td><td class="n">${pct(b.orig.acc)} / ${b.orig.brier.toFixed(4)}</td><td class="n good">${imp > 0 ? (imp * 100).toFixed(1) + '%' : '–'}</td><td class="n">${f1(b.mae)}</td><td class="n">${f1(b.maeTotal)}</td></tr>`; }).join('');
+  $('btTable').innerHTML = `<thead><tr><th>Sport</th><th class="n">Games tested</th><th class="n">Winners picked</th><th class="n">Home win rate</th><th class="n">Brier</th><th class="n">Baseline</th><th class="n">Before tuning (acc / Brier)</th><th class="n">Error cut by tuning</th><th class="n">Margin error</th><th class="n">Total error</th></tr></thead><tbody>${rows}</tbody>`;
+  $('calib').innerHTML = ORDER.map(s => { const b = BACKTEST[s], W = 220, H = 170, pd = 26, x = p => pd + (p - .5) / .5 * (W - pd - 8), y = p => H - pd - (p - .5) / .5 * (H - pd - 8);
+    const pts = b.bins.filter(z => z[0] >= 15);
+    return `<div class="card bt-sport" style="border-left-color:${COLORS[s]}"><h3 style="color:var(--text)">${esc(E.SPORTS[s].short)} calibration</h3><svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block">
+      ${[.5, .75, 1].map(v => `<line x1="${x(.5)}" x2="${x(1)}" y1="${y(v)}" y2="${y(v)}" stroke="#25304d"/><text x="${pd - 4}" y="${y(v) + 3}" fill="#8e9aba" font-size="9" text-anchor="end">${v * 100}</text><text x="${x(v)}" y="${H - pd + 12}" fill="#8e9aba" font-size="9" text-anchor="middle">${v * 100}</text>`).join('')}
+      <line x1="${x(.5)}" y1="${y(.5)}" x2="${x(1)}" y2="${y(1)}" stroke="#8e9aba" stroke-dasharray="3 3"/>
+      <polyline fill="none" stroke="${COLORS[s]}" stroke-width="2.2" points="${pts.map(z => `${x(z[1] / 100)},${y(z[2] / 100)}`).join(' ')}"/>
+      ${pts.map(z => `<circle cx="${x(z[1] / 100)}" cy="${y(z[2] / 100)}" r="${2.5 + Math.sqrt(z[0]) / 9}" fill="${COLORS[s]}"><title>Predicted ${z[1]}%, actual ${z[2]}% (${z[0]} games)</title></circle>`).join('')}
+      <text x="${(W + pd) / 2}" y="${H - 1}" fill="#8e9aba" font-size="9" text-anchor="middle">predicted → actual win %</text></svg>
+      <div class="small muted">Settings: carry ${b.P.carry}, prior ${b.P.prior}, half-life ${b.P.halfLife || 'none'}, cap ${b.P.cap || 'none'}${b.P.b2b ? `, back-to-back ${b.P.b2b}` : ''}</div></div>`; }).join('');
+}
+function parseHistory(text) {
+  const out = [];
+  for (const l of text.trim().split('\n')) { const r = l.split(/[,\t]/).map(x => x.trim()); if (r.length < 5) continue; const t = parseDate(r[0]); const hs = parseFloat(r[3]), as = parseFloat(r[4]);
+    if (isNaN(t) || !isFinite(hs) || !isFinite(as) || !r[1] || !r[2]) continue;
+    out.push({ t, h: r[1], a: r[2], hs, as, n: ['1', 'true', 'yes', 'y', 'n', 'neutral'].includes(String(r[5] || '').toLowerCase()) ? 1 : 0, s: E.seasonOf(t) }); }
+  return out.sort((a, b) => a.t - b.t);
+}
+function btReport(r, P2) {
+  return `<div class="kpis" style="margin-top:6px"><div class="kpi"><div class="k">Games</div><div class="v">${r.n}</div></div><div class="kpi"><div class="k">Winners picked</div><div class="v">${pct(r.accuracy)}</div></div><div class="kpi"><div class="k">Brier</div><div class="v">${r.brier.toFixed(4)}</div><div class="s">baseline ${r.baseBrier.toFixed(4)}</div></div><div class="kpi"><div class="k">Margin error</div><div class="v">${f1(r.mae)}</div></div></div>` + (P2 ? `<div class="note">Best settings for your data: carry ${P2.carry}, prior ${P2.prior}, half-life ${P2.halfLife || 'none'}, blowout cap ${P2.cap || 'none'}${P2.newTeam ? ', new team ' + P2.newTeam : ''}. <button class="btn sm" id="useTuned">Use these settings for ${esc(E.SPORTS[sport].name)}</button></div>` : '');
+}
+function runBt(tune) {
+  const G = parseHistory($('btIn').value); const from = parseDate($('btFrom').value);
+  if (G.length < 100) { $('btMsg').innerHTML = '<span class="warn">Paste at least 100 games (ideally two or more seasons).</span>'; return; }
+  const testFrom = isNaN(from) ? G[Math.floor(G.length * 0.4)].t : from;
+  $('btMsg').innerHTML = '<span class="muted">Running… (this can take a minute for large files)</span>';
+  setTimeout(() => {
+    try { if (!tune) { const r = E.backtest(sport, G, P(), testFrom); $('btMsg').innerHTML = r ? btReport(r) : '<span class="warn">No games after the test date.</span>'; }
+      else { const out = E.tune(sport, G, testFrom); $('btMsg').innerHTML = btReport(out.result, out.P); $('useTuned').onclick = () => { Object.assign(E.SPORTS[sport].p, out.P); ORDER.forEach(invalidate); renderAll(); $('useTuned').textContent = 'Applied ✓'; }; } }
+    catch (e) { $('btMsg').innerHTML = '<span class="bad">Backtest failed: ' + esc(e.message) + '</span>'; }
+  }, 30);
+}
+$('btRun').onclick = () => runBt(false); $('btTune').onclick = () => runBt(true);
+
+// ---------- track record ----------
+function settle(e) {
+  if (e.fa == null || e.fh == null) return null; const m = e.fh - e.fa, t = e.fh + e.fa;
+  const su = m === 0 ? null : ((e.ph - e.pa) * m > 0 ? 1 : 0); let ats = null, ou = null;
+  if (e.spPick && e.spreadH != null) { const c = m + e.spreadH; ats = c === 0 ? 'P' : ((c > 0) === (e.spPick === 'H') ? 'W' : 'L'); }
+  if (e.totPick && e.total != null) ou = t === e.total ? 'P' : ((t > e.total) === (e.totPick === 'Over') ? 'W' : 'L');
+  return { su, ats, ou, err: Math.abs(m - (e.ph - e.pa)) };
+}
+function renderLog() {
+  const rows = LOG.filter(e => e.sp === sport), done = rows.map(e => ({ e, r: settle(e) })).filter(x => x.r);
+  const c = (k, v) => done.filter(x => x.r[k] === v).length, suN = done.filter(x => x.r.su != null).length, suW = c('su', 1);
+  const aW = c('ats', 'W'), aL = c('ats', 'L'), oW = c('ou', 'W'), oL = c('ou', 'L'), roi = (w, l) => w + l ? (w * (100 / 110) - l) / (w + l) : null;
+  const mae = done.length ? done.reduce((s, x) => s + x.r.err, 0) / done.length : null;
+  $('logStats').innerHTML = `<div class="card kpi"><div class="k">${esc(E.SPORTS[sport].short)} winners</div><div class="v">${suN ? `${suW}-${suN - suW}` : '–'}</div><div class="s">${suN ? pct(suW / suN) + ' correct' : 'no results yet'}</div></div>
+    <div class="card kpi"><div class="k">Against the spread</div><div class="v">${aW + aL ? `${aW}-${aL}` : '–'}</div><div class="s">${aW + aL ? pct(aW / (aW + aL)) + ' · ROI ' + sgn(roi(aW, aL) * 100) + '%' : 'need 52.4% to profit'}</div></div>
+    <div class="card kpi"><div class="k">Over / under</div><div class="v">${oW + oL ? `${oW}-${oL}` : '–'}</div><div class="s">${oW + oL ? pct(oW / (oW + oL)) + ' · ROI ' + sgn(roi(oW, oL) * 100) + '%' : 'at −110'}</div></div>
+    <div class="card kpi"><div class="k">Margin error</div><div class="v">${mae == null ? '–' : f1(mae)}</div><div class="s">avg ${E.SPORTS[sport].unit} off</div></div>`;
+  if (!rows.length) { $('logTable').innerHTML = `<div class="empty">No saved ${esc(E.SPORTS[sport].name)} predictions yet.</div>`; return; }
+  const tag = v => v === 'W' ? '<span class="tag g">W</span>' : v === 'L' ? '<span class="tag r">L</span>' : v === 'P' ? '<span class="tag m">P</span>' : '<span class="muted">–</span>';
+  const dp = sport === 'nhl' ? 1 : 0;
+  $('logTable').innerHTML = `<table><thead><tr><th>Saved</th><th>Matchup</th><th class="n">Projected</th><th>Side pick</th><th>Total pick</th><th>Final (away – home)</th><th>SU</th><th>ATS</th><th>O/U</th><th></th></tr></thead><tbody>${rows.map(e => { const r = settle(e);
+    return `<tr><td class="muted small">${new Date(e.ts).toLocaleDateString()}</td><td><b>${esc(e.a)}</b> ${e.n ? 'vs' : '@'} <b>${esc(e.h)}</b></td><td class="n">${e.pa.toFixed(dp)}–${e.ph.toFixed(dp)}</td>
+      <td>${e.spPick ? `${esc(e.spPick === 'H' ? e.h : e.a)} ${sgn(e.spPick === 'H' ? e.spreadH : -e.spreadH)}` : '–'}</td><td>${e.totPick ? `${e.totPick} ${f1(e.total)}` : '–'}</td>
+      <td class="log-score"><input type="number" data-id="${e.id}" data-f="fa" value="${e.fa ?? ''}"> – <input type="number" data-id="${e.id}" data-f="fh" value="${e.fh ?? ''}"></td>
+      <td>${r ? (r.su === 1 ? '<span class="tag g">✓</span>' : r.su === 0 ? '<span class="tag r">✗</span>' : '–') : '<span class="muted">–</span>'}</td><td>${tag(r && r.ats)}</td><td>${tag(r && r.ou)}</td><td><button class="btn ghost sm" data-ldel="${e.id}">✕</button></td></tr>`; }).join('')}</tbody></table>`;
+  $('logTable').querySelectorAll('input[data-id]').forEach(inp => inp.onchange = () => { const e = LOG.find(x => x.id === inp.dataset.id), v = parseFloat(inp.value); e[inp.dataset.f] = isFinite(v) ? v : null; save('log'); setTimeout(renderLog, 0); });
+  $('logTable').querySelectorAll('[data-ldel]').forEach(b => b.onclick = () => { LOG = LOG.filter(x => x.id !== b.dataset.ldel); save('log'); renderLog(); });
+}
+
+// ---------- render ----------
+function renderAll() {
+  const cfg = E.SPORTS[sport], st = S[sport];
+  document.querySelectorAll('#sports button').forEach(b => b.classList.toggle('on', b.dataset.s === sport));
+  document.documentElement.style.setProperty('--accent', COLORS[sport]);
+  $('teamList').innerHTML = teamList().map(t => t.name).sort().map(n => `<option value="${esc(n)}">`).join('');
+  document.querySelectorAll('.unitLbl').forEach(e => e.textContent = cfg.unit);
+  document.querySelectorAll('.b2bRow').forEach(e => e.classList.toggle('hide', !cfg.p.b2b));
+  $('spreadLbl').textContent = sport === 'nhl' ? 'Puck line (goals)' : 'Spread (points)';
+  $('spread').placeholder = sport === 'nhl' ? '1.5' : 'e.g. 3.5';
+  const last = Math.max(st.D.thru, ...st.user.map(g => g.t));
+  $('asOf').textContent = `ratings through ${new Date(last).toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' })} · ${allGames(sport).length} games this season`;
+  $('slateIn').placeholder = sport === 'nhl' ? 'Bruins @ Maple Leafs, -1.5, 6.5' : sport === 'nba' ? 'Lakers @ Celtics, -4.5, 224.5' : sport === 'nfl' ? 'Bills @ Chiefs, -2.5, 47.5' : sport === 'cfb' ? 'Ohio State @ Michigan, +3.5, 44.5' : 'Duke @ North Carolina, -1.5, 152.5';
+  renderResult(); route();
+}
+// engine helpers for betting math
+E.amToDec = a => a >= 100 ? 1 + a / 100 : a <= -100 ? 1 + 100 / -a : NaN;
+E.amToProb = a => a >= 100 ? 100 / (a + 100) : a <= -100 ? -a / (-a + 100) : NaN;
+E.probToAm = p => p <= 0 || p >= 1 ? NaN : p >= 0.5 ? -100 * p / (1 - p) : 100 * (1 - p) / p;
+E.kelly = (p, a) => { const b = E.amToDec(a) - 1; return b > 0 ? Math.max(0, (b * p - (1 - p)) / b) : 0; };
+$('qDate').value = new Date().toISOString().slice(0, 10);
+sport = ORDER.includes(lastSport) ? lastSport : 'nfl';
+renderAll();
+initStore();
+})();
+</script>
+</body>
+</html>
